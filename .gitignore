@@ -1,0 +1,18 @@
+venv/
+venvRental/
+venvRental
+.env/
+.venv/
+.venv
+vEnvTest/
+vEnvTest
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# VS Code settings
+.vscode/
+
+# MacOS
+.DS_Store
