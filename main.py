@@ -8,7 +8,7 @@ from views.dashboard import Dashboard  # Main dashboard
 from views.property_room import PropertyRoomManagement
 from views.rental_management import RentalManagement
 from views.tenant_management import TenantManagement
-from views.payment import PaymentManagement
+from views.payment_management import PaymentManagement
 from views.booking_management import BookingManagement  # Import Booking Management
 
 
