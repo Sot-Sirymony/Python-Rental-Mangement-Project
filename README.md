@@ -11,3 +11,7 @@ https://acidic-bead-ed1.notion.site/Business-Requirement-Detail-Rent-Room-Manage
 
 3. Run 
    models/file_db_setup_v2.py   
+   
+4. Run 
+   main.py
+      

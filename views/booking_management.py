@@ -94,22 +94,19 @@ class BookingManagement(QWidget):
             self.edit_booking_view.show()
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to open Edit Booking View: {e}")
-
-
+    
     def cancel_booking_action(self, booking_id):
-        reason, ok = QInputDialog.getText(self, "Cancel Booking", "Provide a reason for cancellation:")
-        if ok and reason.strip():
-            try:
-                cancel_booking(booking_id, reason)
-                QMessageBox.information(self, "Success", "Booking canceled successfully!")
-                self.load_bookings()
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to cancel booking: {e}")
+        try:
+            cancel_booking(booking_id)
+            QMessageBox.information(self, "Success", "Booking canceled and room status updated successfully!")
+            self.load_bookings()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to cancel booking: {e}")
 
     def confirm_booking_action(self, booking_id):
         try:
             confirm_booking(booking_id)
-            QMessageBox.information(self, "Success", "Booking confirmed successfully!")
+            QMessageBox.information(self, "Success", "Booking confirmed and room status updated successfully!")
             self.load_bookings()
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to confirm booking: {e}")

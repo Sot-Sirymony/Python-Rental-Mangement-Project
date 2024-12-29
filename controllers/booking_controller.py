@@ -76,27 +76,115 @@ def update_booking(booking_id, room_id, tenant_id, start_date, end_date, notes, 
         connection.close()
 
         
-def confirm_booking(booking_id, room_id):
+# def confirm_booking(booking_id, room_id):
+#     connection = sqlite3.connect('rental_management_v2.db')
+#     cursor = connection.cursor()
+#     try:
+#         cursor.execute("UPDATE Booking SET status = 'Active' WHERE id = ?", (booking_id,))
+#         cursor.execute("UPDATE Room SET occupancy_status = 'Rented' WHERE id = ?", (room_id,))
+#         connection.commit()
+#     except Exception as e:
+#         print(f"Error confirming booking: {e}")
+#     finally:
+#         connection.close()   
+        
+# def cancel_booking(booking_id, room_id):
+#     connection = sqlite3.connect('rental_management_v2.db')
+#     cursor = connection.cursor()
+#     try:
+#         cursor.execute("UPDATE Booking SET status = 'Canceled' WHERE id = ?", (booking_id,))
+#         cursor.execute("UPDATE Room SET occupancy_status = 'Available' WHERE id = ?", (room_id,))
+#         connection.commit()
+#     except Exception as e:
+#         print(f"Error canceling booking: {e}")
+#     finally:
+#         connection.close()
+
+def confirm_booking(booking_id):
     connection = sqlite3.connect('rental_management_v2.db')
     cursor = connection.cursor()
     try:
         cursor.execute("UPDATE Booking SET status = 'Active' WHERE id = ?", (booking_id,))
+        cursor.execute("SELECT room_id FROM Booking WHERE id = ?", (booking_id,))
+        room_id = cursor.fetchone()[0]
         cursor.execute("UPDATE Room SET occupancy_status = 'Rented' WHERE id = ?", (room_id,))
         connection.commit()
     except Exception as e:
         print(f"Error confirming booking: {e}")
+        raise
     finally:
-        connection.close()   
+        connection.close()
         
-def cancel_booking(booking_id, room_id):
+def cancel_booking(booking_id):
     connection = sqlite3.connect('rental_management_v2.db')
     cursor = connection.cursor()
     try:
         cursor.execute("UPDATE Booking SET status = 'Canceled' WHERE id = ?", (booking_id,))
-        cursor.execute("UPDATE Room SET occupancy_status = 'Available' WHERE id = ?", (room_id,))
+        cursor.execute("SELECT room_id FROM Booking WHERE id = ?", (booking_id,))
+        room_id = cursor.fetchone()[0]
+
+        # Check if there are no more active or pending bookings for this room
+        cursor.execute("""
+            SELECT COUNT(*) FROM Booking
+            WHERE room_id = ? AND status IN ('Active', 'Pending');
+        """, (room_id,))
+        if cursor.fetchone()[0] == 0:
+            cursor.execute("UPDATE Room SET occupancy_status = 'Available' WHERE id = ?", (room_id,))
+
         connection.commit()
     except Exception as e:
         print(f"Error canceling booking: {e}")
+        raise
     finally:
         connection.close()
+        
+def set_room_status_rented(room_id):
+    """Set the room status to 'Rented'."""
+    connection = sqlite3.connect('rental_management_v2.db')
+    cursor = connection.cursor()
+    try:
+        cursor.execute("UPDATE Room SET occupancy_status = 'Rented' WHERE id = ?", (room_id,))
+        connection.commit()
+    except Exception as e:
+        print(f"Error setting room status to 'Rented': {e}")
+        raise
+    finally:
+        connection.close()
+
+
+def set_room_status_available_if_no_active_or_pending(room_id):
+    """Set the room status to 'Available' if no active or pending bookings exist."""
+    connection = sqlite3.connect('rental_management_v2.db')
+    cursor = connection.cursor()
+    try:
+        cursor.execute("""
+            UPDATE Room
+            SET occupancy_status = 'Available'
+            WHERE id = ?
+            AND NOT EXISTS (
+                SELECT 1 FROM Booking
+                WHERE room_id = ? AND status IN ('Active', 'Pending')
+            )
+        """, (room_id, room_id))
+        connection.commit()
+    except Exception as e:
+        print(f"Error setting room status to 'Available': {e}")
+        raise
+    finally:
+        connection.close()
+
+
+def set_room_status_available(room_id):
+    """Set the room status to 'Available'."""
+    connection = sqlite3.connect('rental_management_v2.db')
+    cursor = connection.cursor()
+    try:
+        cursor.execute("UPDATE Room SET occupancy_status = 'Available' WHERE id = ?", (room_id,))
+        connection.commit()
+    except Exception as e:
+        print(f"Error setting room status to 'Available': {e}")
+        raise
+    finally:
+        connection.close()       
+
              
