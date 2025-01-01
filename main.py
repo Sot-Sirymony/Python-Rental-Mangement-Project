@@ -2,7 +2,7 @@
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QStackedWidget, QVBoxLayout, QHeaderView, QWidget, QPushButton, QDockWidget
+    QApplication, QMainWindow, QStackedWidget, QVBoxLayout, QHeaderView, QWidget, QPushButton, QDockWidget,QSizePolicy
 )
 from views.dashboard import Dashboard  # Main dashboard
 from views.property_room import PropertyRoomManagement

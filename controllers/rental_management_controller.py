@@ -129,37 +129,6 @@ def create_lease(room_id, tenant_id, start_date, end_date):
         raise
     finally:
         connection.close()
-        
-def terminate_lease(lease_id):
-    connection = connect('rental_management_v2.db')
-    cursor = connection.cursor()
-    try:
-        # Fetch the room_id and tenant_id from the lease
-        cursor.execute("""
-        SELECT room_id FROM Lease WHERE id = ?
-        """, (lease_id,))
-        room_id = cursor.fetchone()[0]
-
-        # Update the lease status
-        cursor.execute("""
-        UPDATE Lease
-        SET status = 'Terminated'
-        WHERE id = ?
-        """, (lease_id,))
-
-        # Update the room's occupancy status
-        cursor.execute("""
-        UPDATE Room
-        SET occupancy_status = 'Available', tenant_id = NULL
-        WHERE id = ?
-        """, (room_id,))
-
-        connection.commit()
-    except Exception as e:
-        print(f"Error terminating lease: {e}")
-        raise
-    finally:
-        connection.close()
 def fetch_leases(room_id=None, tenant_id=None):
     connection = connect('rental_management_v2.db')
     cursor = connection.cursor()
