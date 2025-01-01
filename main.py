@@ -23,16 +23,16 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         # Initialize Views
-        self.dashboard = Dashboard()
+        # self.dashboard = Dashboard()
         self.room_management = RoomManagement()
         self.tenant_management = TenantManagement()
         self.rental_management = RentalManagement()
         self.payment_management = PaymentManagement()
         self.booking_management = BookingManagement()  # Initialize Booking Management
-        self.reports = Dashboard()
+        self.dashboard = Dashboard()
 
         # Add Views to Stack
-        self.central_widget.addWidget(self.dashboard)
+        # self.central_widget.addWidget(self.dashboard)
         self.central_widget.addWidget(self.room_management)
         self.central_widget.addWidget(self.tenant_management)
         self.central_widget.addWidget(self.rental_management)
@@ -58,16 +58,16 @@ class MainWindow(QMainWindow):
             return btn
 
         # Create buttons with larger sizes
-        dashboard_btn = create_button("Dashboard", lambda: self.central_widget.setCurrentWidget(self.dashboard))
-        property_room_btn = create_button("Properties & Rooms", lambda: self.central_widget.setCurrentWidget(self.room_management))
+        # dashboard_btn = create_button("Dashboard", lambda: self.central_widget.setCurrentWidget(self.dashboard))
+        property_room_btn = create_button("Rooms Management", lambda: self.central_widget.setCurrentWidget(self.room_management))
         tenant_btn = create_button("Tenants", lambda: self.central_widget.setCurrentWidget(self.tenant_management))
         rental_btn = create_button("Rental Management", lambda: self.central_widget.setCurrentWidget(self.rental_management))
         payment_btn = create_button("Payments", lambda: self.central_widget.setCurrentWidget(self.payment_management))
         booking_btn = create_button("Bookings", lambda: self.central_widget.setCurrentWidget(self.booking_management))  # Booking Button
-        reports_btn = create_button("Reports", lambda: self.central_widget.setCurrentWidget(self.reports))
+        dashboard_btn = create_button("Dashboard", lambda: self.central_widget.setCurrentWidget(self.dashboard))
 
         # Add buttons to the layout
-        for btn in [dashboard_btn, property_room_btn, tenant_btn, rental_btn, payment_btn, booking_btn, reports_btn]:
+        for btn in [property_room_btn, tenant_btn, rental_btn, payment_btn, booking_btn, dashboard_btn]:
             layout.addWidget(btn)
 
         container.setLayout(layout)
