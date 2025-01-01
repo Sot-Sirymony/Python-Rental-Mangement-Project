@@ -9,7 +9,7 @@ from views.terminate_lease import TerminateLeaseView
 from controllers.lease_management_controller import (
     fetch_leases, create_lease, terminate_lease
 )
-from controllers.rental_management_controller import fetch_room_details_with_booking
+from controllers.rental_management_controller import fetch_room_details_with_booking,fetch_room_details_with_booking_and_payment
 
 
 class RentalManagement(QWidget):
@@ -48,7 +48,8 @@ class RentalManagement(QWidget):
 
     def load_rooms(self):
         """Fetch and display all room details with booking information."""
-        rooms = fetch_room_details_with_booking()
+        # rooms = fetch_room_details_with_booking()
+        rooms = fetch_room_details_with_booking_and_payment()
         self.populate_table(rooms)
 
     def populate_table(self, rooms):

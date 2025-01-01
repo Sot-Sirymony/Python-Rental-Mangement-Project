@@ -106,6 +106,48 @@ def fetch_room_details_with_booking():
     finally:
         connection.close() 
         
+def fetch_room_details_with_booking_and_payment():
+    connection = connect('rental_management_v2.db')
+    cursor = connection.cursor()
+    try:
+        cursor.execute("""
+        SELECT
+            r.id AS room_id,
+            r.name AS room_name,
+            r.type AS room_type,
+            r.rental_price,
+            r.payment_frequency,
+            r.security_deposit,
+            r.grace_period,
+            r.occupancy_status,
+            COALESCE(t.first_name || ' ' || t.last_name, 'No Tenant') AS tenant_name,
+            CASE
+                WHEN b.status IS NULL THEN r.occupancy_status
+                ELSE b.status
+            END AS dynamic_status, -- Dynamic status based on bookings
+            COALESCE(SUM(p.amount), 0) AS total_payments, -- Total payment amount
+            MAX(p.date) AS last_payment_date -- Last payment date
+        FROM Room r
+        LEFT JOIN Tenant t ON r.tenant_id = t.id
+        LEFT JOIN (
+            SELECT room_id, status
+            FROM Booking
+            WHERE status IN ('Pending', 'Active') -- Only consider relevant booking statuses
+        ) b ON r.id = b.room_id
+        LEFT JOIN Payment p ON r.id = p.room_id -- Join with Payment table
+        GROUP BY r.id, r.name, r.type, r.rental_price, r.payment_frequency,
+                 r.security_deposit, r.grace_period, r.occupancy_status,
+                 t.first_name, t.last_name, b.status
+        ORDER BY r.id; -- Order by Room ID
+        """)
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error fetching room details with booking and payment info: {e}")
+        return []
+    finally:
+        connection.close()
+        
+        
 def create_lease(room_id, tenant_id, start_date, end_date):
     connection = connect('rental_management_v2.db')
     cursor = connection.cursor()
