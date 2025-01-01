@@ -50,15 +50,18 @@ def update_tenant(tenant_id, first_name, last_name, phone, email):
         connection.close()      
 
 def fetch_rental_history(tenant_id):
+    import sqlite3
     connection = sqlite3.connect('rental_management_v2.db')
     cursor = connection.cursor()
     try:
         cursor.execute("""
-        SELECT Room.name, Lease.start_date, Lease.end_date, Payment.amount, Payment.date, Payment.method
-        FROM Lease
-        JOIN Room ON Lease.room_id = Room.id
-        JOIN Payment ON Payment.tenant_id = Lease.tenant_id
-        WHERE Lease.tenant_id = ?
+        SELECT r.name AS room_name, l.start_date, l.end_date, 
+               p.amount, p.date AS payment_date, p.method AS payment_method
+        FROM Lease l
+        JOIN Room r ON l.room_id = r.id
+        LEFT JOIN Payment p ON l.room_id = p.room_id AND l.tenant_id = p.tenant_id
+        WHERE l.tenant_id = ?
+        ORDER BY l.start_date DESC
         """, (tenant_id,))
         return cursor.fetchall()
     except Exception as e:
@@ -66,4 +69,5 @@ def fetch_rental_history(tenant_id):
         return []
     finally:
         connection.close()
+
 

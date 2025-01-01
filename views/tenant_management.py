@@ -83,7 +83,12 @@ class TenantManagement(QWidget):
         if dialog.exec():
             self.load_tenants()
 
+    # def view_rental_history(self, tenant_data):
+    #     from views.rental_history import RentalHistoryView
+    #     dialog = RentalHistoryView(tenant_data, self)
+    #     dialog.exec()
     def view_rental_history(self, tenant_data):
+        print(f"Opening Rental History for tenant: {tenant_data}")  # Debug: Print tenant data
         from views.rental_history import RentalHistoryView
         dialog = RentalHistoryView(tenant_data, self)
         dialog.exec()
