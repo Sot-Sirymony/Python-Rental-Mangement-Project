@@ -2,13 +2,13 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox
 )
 from PyQt6.QtCore import QDate
-from controllers.payment_controller import add_payment  # Import your add_payment function from the controller
+from controllers.payment_controller import add_payment, fetch_payment_methods, fetch_payment_statuses
 
 class AddPaymentView(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Add New Payment")
-        self.resize(400, 300)
+        self.resize(400, 400)
         self.setModal(True)  # Make the dialog modal
 
         self.layout = QVBoxLayout()
@@ -34,7 +34,7 @@ class AddPaymentView(QDialog):
         # Payment Method
         self.layout.addWidget(QLabel("Payment Method"))
         self.method_selector = QComboBox()
-        self.method_selector.addItems(["Cash", "Bank Transfer", "Check"])  # Populate payment methods
+        self.populate_payment_methods()  # Dynamically load methods
         self.layout.addWidget(self.method_selector)
 
         # Payment Date
@@ -45,10 +45,24 @@ class AddPaymentView(QDialog):
         self.date_input.setDate(QDate.currentDate())  # Default to current date
         self.layout.addWidget(self.date_input)
 
-        # Payment Reference
+        # Due Date (Optional)
+        self.layout.addWidget(QLabel("Due Date (Optional)"))
+        self.due_date_input = QDateEdit()
+        self.due_date_input.setCalendarPopup(True)
+        self.due_date_input.setDisplayFormat("yyyy-MM-dd")
+        self.layout.addWidget(self.due_date_input)
+
+        # Payment Reference (Optional)
         self.layout.addWidget(QLabel("Payment Reference (Optional)"))
         self.reference_input = QTextEdit()
+        self.reference_input.setPlaceholderText("Enter reference if any")
         self.layout.addWidget(self.reference_input)
+
+        # Payment Status
+        self.layout.addWidget(QLabel("Payment Status"))
+        self.status_selector = QComboBox()
+        self.populate_payment_statuses()  # Dynamically load statuses
+        self.layout.addWidget(self.status_selector)
 
         # Save Button
         self.save_btn = QPushButton("Save Payment")
@@ -69,13 +83,29 @@ class AddPaymentView(QDialog):
 
     def load_rooms(self):
         """Load rooms into the room dropdown."""
-        from controllers.room_controller import fetch_properties
-        rooms = fetch_properties()
+        from controllers.room_controller import fetch_available_rooms
+        rooms = fetch_available_rooms()
         if rooms:
             for room in rooms:
                 self.room_selector.addItem(f"{room[1]} ({room[0]})", room[0])  # Display room name/ID, store room_id
         else:
             self.room_selector.addItem("No rooms found", None)
+
+    def populate_payment_methods(self):
+        """Dynamically load payment methods."""
+        methods = fetch_payment_methods()
+        if methods:
+            self.method_selector.addItems(methods)
+        else:
+            self.method_selector.addItem("No methods available")
+
+    def populate_payment_statuses(self):
+        """Dynamically load payment statuses."""
+        statuses = fetch_payment_statuses()
+        if statuses:
+            self.status_selector.addItems(statuses)
+        else:
+            self.status_selector.addItem("No statuses available")
 
     def save_payment(self):
         """Save the payment data to the database."""
@@ -84,7 +114,9 @@ class AddPaymentView(QDialog):
         amount = self.amount_input.text().strip()
         method = self.method_selector.currentText()
         date = self.date_input.date().toString("yyyy-MM-dd")
+        due_date = self.due_date_input.date().toString("yyyy-MM-dd") if self.due_date_input.date() else None
         reference = self.reference_input.toPlainText().strip()
+        status = self.status_selector.currentText()
 
         # Validation
         if not tenant_id:
@@ -93,16 +125,20 @@ class AddPaymentView(QDialog):
         if not room_id:
             QMessageBox.warning(self, "Validation Error", "Please select a room.")
             return
-        if not amount or not amount.replace(".", "").isdigit():
-            QMessageBox.warning(self, "Validation Error", "Please enter a valid payment amount.")
+        if not amount or not amount.replace(".", "", 1).isdigit() or float(amount) <= 0:
+            QMessageBox.warning(self, "Validation Error", "Please enter a valid payment amount (positive number).")
+            return
+        if due_date and due_date < date:
+            QMessageBox.warning(self, "Validation Error", "Due date must not be earlier than payment date.")
             return
 
         try:
             # Save payment using the controller
-            add_payment(tenant_id, room_id, float(amount), method, date, reference)
+            add_payment(tenant_id, room_id, float(amount), date, method, reference, due_date, status)
             QMessageBox.information(self, "Success", "Payment added successfully!")
             if self.parent():
                 self.parent().load_payments()  # Refresh parent view
             self.accept()  # Close the dialog
         except Exception as e:
+            print(f"Error adding payment: {e}")
             QMessageBox.critical(self, "Error", f"Failed to add payment: {e}")

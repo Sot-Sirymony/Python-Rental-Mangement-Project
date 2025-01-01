@@ -35,17 +35,16 @@ class BookingManagement(QWidget):
 
         self.setLayout(self.layout)
         self.load_bookings()
-
     def load_bookings(self):
         try:
-            bookings = fetch_bookings()
+            bookings = fetch_bookings()  # Fetch bookings from the database
             print("Fetched bookings:", bookings)  # Debug: Print fetched bookings
-            self.booking_table.setRowCount(0)
 
-            if not bookings:
-                QMessageBox.information(self, "Info", "No bookings found.")
-                return
+            self.booking_table.setRowCount(0)  # Clear any existing rows
 
+            if not bookings:  # Check if bookings are empty or None
+                #QMessageBox.information(self, "Info", "No bookings found.")
+                return  # Exit the function if there are no bookings
             for row_data in bookings:
                 print("Processing row:", row_data)  # Debug: Print each row data
                 row = self.booking_table.rowCount()
@@ -63,13 +62,13 @@ class BookingManagement(QWidget):
 
                 # Add Cancel button
                 cancel_btn = QPushButton("Cancel")
-                if row_data[5] != "Canceled":
+                if row_data[5] != "Canceled":  # Check status before enabling Cancel
                     cancel_btn.clicked.connect(partial(self.cancel_booking_action, row_data[0]))
                 self.booking_table.setCellWidget(row, 8, cancel_btn)
 
                 # Add Confirm button
                 confirm_btn = QPushButton("Confirm")
-                if row_data[5] == "Pending":
+                if row_data[5] == "Pending":  # Check status before enabling Confirm
                     confirm_btn.clicked.connect(partial(self.confirm_booking_action, row_data[0]))
                 self.booking_table.setCellWidget(row, 9, confirm_btn)
 
@@ -79,7 +78,9 @@ class BookingManagement(QWidget):
                 self.booking_table.setCellWidget(row, 10, delete_btn)
 
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to load bookings: {e}")     
+            print(f"Error occurred: {e}")  # Debug: Print exception details
+            QMessageBox.critical(self, "Error", f"Failed to load bookings: {e}")
+    
             
     def open_add_booking_view(self):
         try:

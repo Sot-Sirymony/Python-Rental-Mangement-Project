@@ -1,5 +1,4 @@
 
-
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QStackedWidget, QVBoxLayout, QHeaderView, QWidget, QPushButton, QDockWidget,QSizePolicy
@@ -10,7 +9,6 @@ from views.rental_management import RentalManagement
 from views.tenant_management import TenantManagement
 from views.payment_management import PaymentManagement
 from views.booking_management import BookingManagement  # Import Booking Management
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -38,7 +36,7 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.rental_management)
         self.central_widget.addWidget(self.payment_management)
         self.central_widget.addWidget(self.booking_management)  # Add Booking Management to stack
-        self.central_widget.addWidget(self.reports)
+        self.central_widget.addWidget(self.dashboard)
 
         # Sidebar Navigation
         self.init_sidebar()
@@ -81,4 +79,6 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+
+
 

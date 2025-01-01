@@ -51,6 +51,7 @@ def reset_and_initialize_db():
         date TEXT NOT NULL,
         method TEXT,
         due_date TEXT,
+        notes TEXT,
         payment_status TEXT DEFAULT 'Pending',
         reference_number TEXT,
         FOREIGN KEY (tenant_id) REFERENCES Tenant (id),

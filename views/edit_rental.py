@@ -1,6 +1,6 @@
 
 from PyQt6.QtWidgets import (
-    QVBoxLayout, QLineEdit, QComboBox, QPushButton, QDialog, QLabel, QMessageBox
+    QVBoxLayout, QLineEdit, QComboBox, QTextEdit, QPushButton, QDialog, QLabel, QMessageBox
 )
 from controllers.tenant_controller import fetch_tenants
 from controllers.rental_management_controller import (
@@ -56,13 +56,21 @@ class EditRentalView(QDialog):
         tenants = fetch_tenants()
         self.tenant_selector.addItem("No Tenant", None)  # Allow no tenant
         for tenant in tenants:
-            self.tenant_selector.addItem(f"{tenant[1]} ({tenant[2]})", tenant[0])
+            self.tenant_selector.addItem(f"{tenant[1]} {tenant[2]}", tenant[0])
         if room_data[8] and room_data[8] != "No Tenant":
             for i in range(self.tenant_selector.count()):
                 if self.tenant_selector.itemText(i) == room_data[8]:
                     self.tenant_selector.setCurrentIndex(i)
                     break
         self.layout.addWidget(self.tenant_selector)
+
+        # Amenities (Optional Field)
+        self.layout.addWidget(QLabel("Amenities:"))
+        self.amenities_input = QTextEdit()
+        self.amenities_input.setPlaceholderText("Enter amenities (comma-separated)")
+        if len(room_data) > 9:
+            self.amenities_input.setText(room_data[9])  # Populate if amenities are passed
+        self.layout.addWidget(self.amenities_input)
 
         # Save Button
         self.save_btn = QPushButton("Save Changes")
@@ -82,11 +90,13 @@ class EditRentalView(QDialog):
             payment_frequency = self.payment_frequency_input.currentText()
             occupancy_status = self.occupancy_status_input.currentText()
             tenant_id = self.tenant_selector.currentData()
+            amenities = self.amenities_input.toPlainText().strip()
 
             # Call Controllers
             set_rental_price_and_terms(self.room_id, rental_price, payment_frequency, security_deposit, grace_period)
             update_occupancy_status(self.room_id, occupancy_status)
             update_tenant_for_room(self.room_id, tenant_id)
+
 
             QMessageBox.information(self, "Success", "Room details updated successfully!")
             self.accept()
@@ -101,6 +111,5 @@ class EditRentalView(QDialog):
             return cast_type(value)
         except ValueError:
             raise ValueError(f"{field_name} must be a valid numeric value.")
-
 
 

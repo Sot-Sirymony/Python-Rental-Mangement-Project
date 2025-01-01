@@ -1,16 +1,11 @@
 
 from PyQt6.QtWidgets import (
     QVBoxLayout, QComboBox, QPushButton, QTableWidget, QTableWidgetItem,
-    QWidget, QLabel, QMessageBox, QSizePolicy
+    QWidget, QLabel, QMessageBox, QSizePolicy, QHBoxLayout
 )
 from functools import partial
 from views.edit_rental import EditRentalView
-from views.terminate_lease import TerminateLeaseView
-from controllers.lease_management_controller import (
-    fetch_leases, create_lease, terminate_lease
-)
-from controllers.rental_management_controller import fetch_room_details_with_booking,fetch_room_details_with_booking_and_payment
-
+from controllers.rental_management_controller import fetch_room_details_with_related_data
 
 class RentalManagement(QWidget):
     def __init__(self):
@@ -26,31 +21,38 @@ class RentalManagement(QWidget):
 
         # Room Table
         self.room_table = QTableWidget()
-        self.room_table.setColumnCount(11)  # Removed the "Edit Lease" action
+        self.room_table.setColumnCount(16)  # Updated to include lease details
         self.room_table.setHorizontalHeaderLabels([
-            "ID", "Name", "Type", "Rental Price", "Payment Frequency",
-            "Security Deposit", "Grace Period", "Occupancy Status",
-            "Tenant", "Booking Status", "Room Actions"
+            "Room ID", "Room Name", "Room Type", "Rental Price", "Payment Frequency",
+            "Security Deposit", "Grace Period", "Occupancy Status", "Tenant Name",
+            "Dynamic Status", "Total Payments", "Last Payment Date", "Latest Due Date",
+            "Payment References", "Lease Start Date", "Lease End Date"
         ])
         self.layout.addWidget(self.room_table)
 
         # Buttons
-        self.create_lease_btn = QPushButton("Create Lease")
-        self.create_lease_btn.clicked.connect(self.open_create_lease_view)
-        self.layout.addWidget(self.create_lease_btn)
+        button_layout = QHBoxLayout()
 
         self.refresh_btn = QPushButton("Refresh Rooms")
         self.refresh_btn.clicked.connect(self.load_rooms)
-        self.layout.addWidget(self.refresh_btn)
+        button_layout.addWidget(self.refresh_btn)
 
+        self.create_lease_btn = QPushButton("Create Lease")
+        self.create_lease_btn.clicked.connect(self.open_create_lease_view)
+        button_layout.addWidget(self.create_lease_btn)
+
+        self.layout.addLayout(button_layout)
         self.setLayout(self.layout)
+
         self.load_rooms()
 
     def load_rooms(self):
-        """Fetch and display all room details with booking information."""
-        # rooms = fetch_room_details_with_booking()
-        rooms = fetch_room_details_with_booking_and_payment()
-        self.populate_table(rooms)
+        """Fetch and display all room details with related data."""
+        try:
+            rooms = fetch_room_details_with_related_data()
+            self.populate_table(rooms)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to load room data: {e}")
 
     def populate_table(self, rooms):
         """Populate the table with room data."""
@@ -59,29 +61,51 @@ class RentalManagement(QWidget):
             row = self.room_table.rowCount()
             self.room_table.insertRow(row)
 
-            # Populate all columns except actions
-            for col, data in enumerate(row_data[:-1]):
+            # Populate all columns with room data
+            for col, data in enumerate(row_data):
                 item = QTableWidgetItem(str(data) if data is not None else "N/A")
                 self.room_table.setItem(row, col, item)
 
-            # Add Room Actions Buttons
+            # Add action buttons
             self.add_room_actions(row, row_data)
 
     def add_room_actions(self, row, row_data):
-        """Add room action buttons to the table."""
-        room_actions_widget = QWidget()
-        room_layout = QVBoxLayout()
-        room_layout.setContentsMargins(5, 5, 5, 5)
-        room_layout.setSpacing(10)
+        """Add action buttons to the table."""
+        action_widget = QWidget()
+        action_layout = QHBoxLayout()
+        action_layout.setContentsMargins(0, 0, 0, 0)
+        action_layout.setSpacing(5)
 
-        edit_room_btn = QPushButton("Edit Room")
-        edit_room_btn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
-        edit_room_btn.setMinimumHeight(30)
-        edit_room_btn.clicked.connect(partial(self.open_edit_view, row_data))
-        room_layout.addWidget(edit_room_btn)
+        edit_btn = QPushButton("Edit Room")
+        edit_btn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
+        edit_btn.clicked.connect(partial(self.open_edit_view, row_data))
+        action_layout.addWidget(edit_btn)
 
-        room_actions_widget.setLayout(room_layout)
-        self.room_table.setCellWidget(row, 10, room_actions_widget)
+        view_lease_btn = QPushButton("View Lease")
+        view_lease_btn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
+        view_lease_btn.clicked.connect(partial(self.view_lease_details, row_data))
+        action_layout.addWidget(view_lease_btn)
+
+        action_widget.setLayout(action_layout)
+        self.room_table.setCellWidget(row, 15, action_widget)  # Assuming the last column index is 15
+
+    def filter_rooms(self, status):
+        """Filter rooms based on the selected status."""
+        try:
+            all_rooms = fetch_room_details_with_related_data()
+            filtered_rooms = (
+                all_rooms if status == "All" else
+                [room for room in all_rooms if (room[7] == status or (status == "Booked" and room[9] != "No Booking"))]
+            )
+            self.populate_table(filtered_rooms)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to filter room data: {e}")
+
+    def open_edit_view(self, room_data):
+        """Open the edit dialog for the selected room."""
+        dialog = EditRentalView(room_data, self)
+        if dialog.exec():
+            self.load_rooms()
 
     def open_create_lease_view(self):
         """Open a dialog to create a new lease."""
@@ -90,25 +114,8 @@ class RentalManagement(QWidget):
         if dialog.exec():
             self.load_rooms()
 
-    def open_terminate_lease_view(self, lease_data):
-        """Open the terminate lease dialog for the selected lease."""
-        dialog = TerminateLeaseView(lease_data, self)
-        if dialog.exec():
-            self.load_rooms()
-
-    def open_edit_view(self, room_data):
-        """Open the edit dialog for the selected room."""
-        dialog = EditRentalView(room_data, self)
-        if dialog.exec():
-            self.load_rooms()
-
-    def filter_rooms(self, status):
-        """Filter rooms based on the selected status."""
-        all_rooms = fetch_room_details_with_booking()
-        filtered_rooms = (
-            all_rooms if status == "All" else
-            [room for room in all_rooms if (room[7] == status or (status == "Booked" and room[9] != "No Booking"))]
-        )
-        self.populate_table(filtered_rooms)
-
-
+    def view_lease_details(self, room_data):
+        """View lease details for a selected room."""
+        from views.lease_details import LeaseDetailsView
+        dialog = LeaseDetailsView(room_data, self)
+        dialog.exec()

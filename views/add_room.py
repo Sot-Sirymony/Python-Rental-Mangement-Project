@@ -1,62 +1,56 @@
 
-from PyQt6.QtWidgets import QVBoxLayout, QLineEdit, QPushButton, QLabel, QWidget
+from PyQt6.QtWidgets import (
+    QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
+)
 from controllers.room_controller import add_room
+class AddRoomView(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Add New Room")
+        self.resize(400, 400)
+        self.setModal(True)  # Make the dialog modal
 
-class AddRoomView(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Add Room")
         self.layout = QVBoxLayout()
 
-        # Error Label
-        self.error_label = QLabel("")
-        self.error_label.setStyleSheet("color: red;")
-        self.layout.addWidget(self.error_label)
-
         # Room Name
-        self.name_label = QLabel("Room Name/Number:")
-        self.layout.addWidget(self.name_label)
+        self.layout.addWidget(QLabel("Room Name/Number"))
         self.name_input = QLineEdit()
         self.name_input.setPlaceholderText("Enter Room Name/Number")
         self.layout.addWidget(self.name_input)
 
         # Room Type
-        self.type_label = QLabel("Room Type:")
-        self.layout.addWidget(self.type_label)
+        self.layout.addWidget(QLabel("Room Type"))
         self.type_input = QLineEdit()
         self.type_input.setPlaceholderText("Enter Room Type (e.g., Single, Double)")
         self.layout.addWidget(self.type_input)
 
         # Room Size
-        self.size_label = QLabel("Room Size (e.g., sq ft or m²):")
-        self.layout.addWidget(self.size_label)
+        self.layout.addWidget(QLabel("Room Size (e.g., sq ft or m²)"))
         self.size_input = QLineEdit()
         self.size_input.setPlaceholderText("Enter Size (e.g., 25.5)")
         self.layout.addWidget(self.size_input)
 
         # Rental Price
-        self.price_label = QLabel("Rental Price:")
-        self.layout.addWidget(self.price_label)
+        self.layout.addWidget(QLabel("Rental Price"))
         self.price_input = QLineEdit()
         self.price_input.setPlaceholderText("Enter Rental Price")
         self.layout.addWidget(self.price_input)
 
         # Amenities
-        self.amenities_label = QLabel("Amenities:")
-        self.layout.addWidget(self.amenities_label)
+        self.layout.addWidget(QLabel("Amenities"))
         self.amenities_input = QLineEdit()
         self.amenities_input.setPlaceholderText("Enter Amenities (comma-separated)")
         self.layout.addWidget(self.amenities_input)
 
-        # Save Room Button
-        self.add_btn = QPushButton("Save Room")
-        self.add_btn.clicked.connect(self.save_room)
-        self.layout.addWidget(self.add_btn)
+        # Save Button
+        self.save_btn = QPushButton("Save Room")
+        self.save_btn.clicked.connect(self.save_room)
+        self.layout.addWidget(self.save_btn)
 
         self.setLayout(self.layout)
 
     def save_room(self):
-        # Get input values
+        """Save the room data to the database."""
         name = self.name_input.text().strip()
         room_type = self.type_input.text().strip()
         size = self.size_input.text().strip()
@@ -65,32 +59,23 @@ class AddRoomView(QWidget):
 
         # Validation
         if not name:
-            self.error_label.setText("Error: Room Name/Number is required.")
+            QMessageBox.warning(self, "Validation Error", "Please enter a room name/number.")
             return
         if not room_type:
-            self.error_label.setText("Error: Room Type is required.")
+            QMessageBox.warning(self, "Validation Error", "Please enter a room type.")
             return
-        if not size:
-            self.error_label.setText("Error: Room Size is required.")
+        if not size or not size.replace(".", "", 1).isdigit() or float(size) <= 0:
+            QMessageBox.warning(self, "Validation Error", "Please enter a valid room size (positive number).")
             return
-        if not size.replace('.', '', 1).isdigit():
-            self.error_label.setText("Error: Room Size must be a numeric value.")
-            return
-        if not rental_price:
-            self.error_label.setText("Error: Rental Price is required.")
-            return
-        if not rental_price.replace('.', '', 1).isdigit():
-            self.error_label.setText("Error: Rental Price must be a numeric value.")
+        if not rental_price or not rental_price.replace(".", "", 1).isdigit() or float(rental_price) <= 0:
+            QMessageBox.warning(self, "Validation Error", "Please enter a valid rental price (positive number).")
             return
 
         try:
-            # Convert numeric fields
-            size = float(size)
-            rental_price = float(rental_price)
-
-            # Save room data
-            add_room(name, room_type, size, rental_price, amenities)
-            print("Room added successfully!")
-            self.close()
+            # Save room using the controller
+            add_room(name, room_type, float(size), float(rental_price), amenities)
+            QMessageBox.information(self, "Success", "Room added successfully!")
+            self.accept()  # Close the dialog
         except Exception as e:
-            self.error_label.setText(f"Error: Failed to add room. {e}")
+            print(f"Error adding room: {e}")
+            QMessageBox.critical(self, "Error", f"Failed to add room: {e}")

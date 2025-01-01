@@ -23,6 +23,26 @@ def add_booking(room_id, tenant_id, start_date, end_date, notes, status="Pending
         raise
     finally:
         connection.close()
+# def fetch_bookings():
+#     connection = sqlite3.connect('rental_management_v2.db')
+#     cursor = connection.cursor()
+#     try:
+#         cursor.execute("""
+#         SELECT b.id, r.name AS room_name, 
+#                t.first_name || ' ' || t.last_name AS tenant_name, 
+#                b.start_date, b.end_date, b.status,b.notes
+#         FROM Booking b
+#         JOIN Room r ON b.room_id = r.id
+#         JOIN Tenant t ON b.tenant_id = t.id;
+#         """)
+#         bookings = cursor.fetchall()
+#         return bookings
+#     except Exception as e:
+#         print(f"Error fetching bookings: {e}")
+#         return []
+#     finally:
+#         connection.close()
+
 def fetch_bookings():
     connection = sqlite3.connect('rental_management_v2.db')
     cursor = connection.cursor()
