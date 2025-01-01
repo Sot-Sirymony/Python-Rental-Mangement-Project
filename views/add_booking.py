@@ -108,7 +108,7 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox
 )
 from controllers.booking_controller import add_booking
-from controllers.property_controller import fetch_available_rooms
+from controllers.room_controller import fetch_available_rooms
 from controllers.tenant_controller import fetch_tenants
 
 

@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox
 )
 from controllers.booking_controller import update_booking
-from controllers.property_controller import fetch_available_rooms
+from controllers.room_controller import fetch_available_rooms
 from controllers.tenant_controller import fetch_tenants
 from PyQt6.QtCore import QDate
 import sqlite3

@@ -1,6 +1,6 @@
 
 from PyQt6.QtWidgets import QVBoxLayout, QLineEdit, QTextEdit, QPushButton, QLabel, QWidget
-from controllers.property_controller import update_property
+from controllers.room_controller import update_property
 
 class EditPropertyView(QWidget):
     def __init__(self, property_id, current_data):

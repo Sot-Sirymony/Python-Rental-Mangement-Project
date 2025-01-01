@@ -69,7 +69,7 @@ class AddPaymentView(QDialog):
 
     def load_rooms(self):
         """Load rooms into the room dropdown."""
-        from controllers.property_controller import fetch_properties
+        from controllers.room_controller import fetch_properties
         rooms = fetch_properties()
         if rooms:
             for room in rooms:
