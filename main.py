@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QStackedWidget, QVBoxLayout, QHeaderView, QWidget, QPushButton, QDockWidget,QSizePolicy
 )
 from views.dashboard import Dashboard  # Main dashboard
-from views.property_room import PropertyRoomManagement
+from views.room_management import RoomManagement
 from views.rental_management import RentalManagement
 from views.tenant_management import TenantManagement
 from views.payment_management import PaymentManagement
@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
 
         # Initialize Views
         self.dashboard = Dashboard()
-        self.property_room_management = PropertyRoomManagement()
+        self.room_management = RoomManagement()
         self.tenant_management = TenantManagement()
         self.rental_management = RentalManagement()
         self.payment_management = PaymentManagement()
@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
 
         # Add Views to Stack
         self.central_widget.addWidget(self.dashboard)
-        self.central_widget.addWidget(self.property_room_management)
+        self.central_widget.addWidget(self.room_management)
         self.central_widget.addWidget(self.tenant_management)
         self.central_widget.addWidget(self.rental_management)
         self.central_widget.addWidget(self.payment_management)
@@ -59,7 +59,7 @@ class MainWindow(QMainWindow):
 
         # Create buttons with larger sizes
         dashboard_btn = create_button("Dashboard", lambda: self.central_widget.setCurrentWidget(self.dashboard))
-        property_room_btn = create_button("Properties & Rooms", lambda: self.central_widget.setCurrentWidget(self.property_room_management))
+        property_room_btn = create_button("Properties & Rooms", lambda: self.central_widget.setCurrentWidget(self.room_management))
         tenant_btn = create_button("Tenants", lambda: self.central_widget.setCurrentWidget(self.tenant_management))
         rental_btn = create_button("Rental Management", lambda: self.central_widget.setCurrentWidget(self.rental_management))
         payment_btn = create_button("Payments", lambda: self.central_widget.setCurrentWidget(self.payment_management))

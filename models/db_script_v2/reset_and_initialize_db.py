@@ -1,25 +1,21 @@
+
 import sqlite3
 
-def initialize_db():
+def reset_and_initialize_db():
     connection = sqlite3.connect('rental_management_v2.db')
     cursor = connection.cursor()
 
-    # Create Property table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Property (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
-        address TEXT,
-        description TEXT,
-        amenities TEXT
-    );
-    """)
+    # Drop existing tables if they exist
+    cursor.execute("DROP TABLE IF EXISTS Booking;")
+    cursor.execute("DROP TABLE IF EXISTS Lease;")
+    cursor.execute("DROP TABLE IF EXISTS Payment;")
+    cursor.execute("DROP TABLE IF EXISTS Tenant;")
+    cursor.execute("DROP TABLE IF EXISTS Room;")
 
     # Create Room table
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Room (
+    CREATE TABLE Room (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        property_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         type TEXT,
         size REAL,
@@ -30,13 +26,13 @@ def initialize_db():
         occupancy_status TEXT DEFAULT 'Available',
         tenant_id INTEGER REFERENCES Tenant (id) ON DELETE SET NULL,
         amenities TEXT,
-        FOREIGN KEY (property_id) REFERENCES Property (id) ON DELETE CASCADE
+        total_rent_collected REAL DEFAULT 0
     );
     """)
 
     # Create Tenant table
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Tenant (
+    CREATE TABLE Tenant (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
@@ -47,13 +43,16 @@ def initialize_db():
 
     # Create Payment table
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Payment (
+    CREATE TABLE Payment (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tenant_id INTEGER NOT NULL,
         room_id INTEGER NOT NULL,
         amount REAL NOT NULL,
         date TEXT NOT NULL,
         method TEXT,
+        due_date TEXT,
+        payment_status TEXT DEFAULT 'Pending',
+        reference_number TEXT,
         FOREIGN KEY (tenant_id) REFERENCES Tenant (id),
         FOREIGN KEY (room_id) REFERENCES Room (id)
     );
@@ -61,7 +60,7 @@ def initialize_db():
 
     # Create Lease table
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Lease (
+    CREATE TABLE Lease (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         room_id INTEGER NOT NULL,
         tenant_id INTEGER NOT NULL,
@@ -75,7 +74,7 @@ def initialize_db():
 
     # Create Booking table
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS Booking (
+    CREATE TABLE Booking (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         room_id INTEGER NOT NULL,
         tenant_id INTEGER NOT NULL,
@@ -94,4 +93,5 @@ def initialize_db():
     connection.close()
 
 if __name__ == "__main__":
-    initialize_db()
+    reset_and_initialize_db()
+

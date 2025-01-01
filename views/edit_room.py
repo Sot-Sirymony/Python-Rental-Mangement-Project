@@ -1,6 +1,6 @@
 
 from PyQt6.QtWidgets import QVBoxLayout, QLineEdit, QPushButton, QLabel, QWidget
-from controllers.property_controller import update_room
+from controllers.room_controller import update_room
 
 class EditRoomView(QWidget):
     def __init__(self, room_id, current_data):
@@ -29,10 +29,10 @@ class EditRoomView(QWidget):
         self.layout.addWidget(self.type_input)
 
         # Room Size
-        self.size_label = QLabel("Room Size:")
+        self.size_label = QLabel("Room Size (e.g., sq ft or m²):")
         self.layout.addWidget(self.size_label)
         self.size_input = QLineEdit(current_data['size'])
-        self.size_input.setPlaceholderText("Enter Room Size (e.g., 25.5 sqm)")
+        self.size_input.setPlaceholderText("Enter Room Size (e.g., 25.5)")
         self.layout.addWidget(self.size_input)
 
         # Rental Price
@@ -95,4 +95,5 @@ class EditRoomView(QWidget):
             self.close()
         except Exception as e:
             self.error_label.setText(f"Error: Failed to update room. {e}")
+
 

@@ -1,5 +1,7 @@
-from PyQt6.QtWidgets import QVBoxLayout, QLineEdit, QComboBox, QPushButton, QLabel, QWidget
-from controllers.property_controller import add_room, fetch_properties
+
+from PyQt6.QtWidgets import QVBoxLayout, QLineEdit, QPushButton, QLabel, QWidget
+from controllers.room_controller import add_room
+
 class AddRoomView(QWidget):
     def __init__(self):
         super().__init__()
@@ -10,14 +12,6 @@ class AddRoomView(QWidget):
         self.error_label = QLabel("")
         self.error_label.setStyleSheet("color: red;")
         self.layout.addWidget(self.error_label)
-
-        # Property Selector
-        self.property_label = QLabel("Select Property:")
-        self.layout.addWidget(self.property_label)
-        properties = fetch_properties()
-        self.property_selector = QComboBox()
-        self.property_selector.addItems([prop[1] for prop in properties])
-        self.layout.addWidget(self.property_selector)
 
         # Room Name
         self.name_label = QLabel("Room Name/Number:")
@@ -63,7 +57,6 @@ class AddRoomView(QWidget):
 
     def save_room(self):
         # Get input values
-        property_id = self.property_selector.currentIndex() + 1
         name = self.name_input.text().strip()
         room_type = self.type_input.text().strip()
         size = self.size_input.text().strip()
@@ -96,9 +89,8 @@ class AddRoomView(QWidget):
             rental_price = float(rental_price)
 
             # Save room data
-            add_room(property_id, name, room_type, size, rental_price, amenities)
+            add_room(name, room_type, size, rental_price, amenities)
             print("Room added successfully!")
             self.close()
         except Exception as e:
             self.error_label.setText(f"Error: Failed to add room. {e}")
-
