@@ -1,8 +1,10 @@
 
+
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 )
 from controllers.room_controller import add_room
+
 class AddRoomView(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -12,38 +14,57 @@ class AddRoomView(QDialog):
 
         self.layout = QVBoxLayout()
 
+        # Shared stylesheet for labels
+        label_style = "font-size: 16px;"
+
         # Room Name
-        self.layout.addWidget(QLabel("Room Name/Number"))
+        room_name_label = QLabel("Room Name/Number")
+        room_name_label.setStyleSheet(label_style)
+        self.layout.addWidget(room_name_label)
         self.name_input = QLineEdit()
         self.name_input.setPlaceholderText("Enter Room Name/Number")
+        self.name_input.setStyleSheet("font-size: 14px;")
         self.layout.addWidget(self.name_input)
 
         # Room Type
-        self.layout.addWidget(QLabel("Room Type"))
+        room_type_label = QLabel("Room Type")
+        room_type_label.setStyleSheet(label_style)
+        self.layout.addWidget(room_type_label)
         self.type_input = QLineEdit()
         self.type_input.setPlaceholderText("Enter Room Type (e.g., Single, Double)")
+        self.type_input.setStyleSheet("font-size: 14px;")
         self.layout.addWidget(self.type_input)
 
         # Room Size
-        self.layout.addWidget(QLabel("Room Size (e.g., sq ft or m²)"))
+        room_size_label = QLabel("Room Size (e.g., sq ft or m²)")
+        room_size_label.setStyleSheet(label_style)
+        self.layout.addWidget(room_size_label)
         self.size_input = QLineEdit()
         self.size_input.setPlaceholderText("Enter Size (e.g., 25.5)")
+        self.size_input.setStyleSheet("font-size: 14px;")
         self.layout.addWidget(self.size_input)
 
         # Rental Price
-        self.layout.addWidget(QLabel("Rental Price"))
+        rental_price_label = QLabel("Rental Price")
+        rental_price_label.setStyleSheet(label_style)
+        self.layout.addWidget(rental_price_label)
         self.price_input = QLineEdit()
         self.price_input.setPlaceholderText("Enter Rental Price")
+        self.price_input.setStyleSheet("font-size: 14px;")
         self.layout.addWidget(self.price_input)
 
         # Amenities
-        self.layout.addWidget(QLabel("Amenities"))
+        amenities_label = QLabel("Amenities")
+        amenities_label.setStyleSheet(label_style)
+        self.layout.addWidget(amenities_label)
         self.amenities_input = QLineEdit()
         self.amenities_input.setPlaceholderText("Enter Amenities (comma-separated)")
+        self.amenities_input.setStyleSheet("font-size: 14px;")
         self.layout.addWidget(self.amenities_input)
 
         # Save Button
         self.save_btn = QPushButton("Save Room")
+        self.save_btn.setStyleSheet("font-size: 14px; padding: 10px;")
         self.save_btn.clicked.connect(self.save_room)
         self.layout.addWidget(self.save_btn)
 

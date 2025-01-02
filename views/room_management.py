@@ -1,108 +1,147 @@
 
-
 from PyQt6.QtWidgets import (
-    QVBoxLayout, QPushButton, QLabel, QWidget, QTableWidget, QTableWidgetItem, QHeaderView
+    QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QPushButton,
+    QWidget, QMessageBox, QHBoxLayout, QSizePolicy
 )
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont
 from functools import partial
+from controllers.room_controller import fetch_rooms
 
 
 class RoomManagement(QWidget):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("Room Management")
         self.layout = QVBoxLayout()
 
-        self.layout.addWidget(QLabel("Rooms Management"))
-
+        # Room Table
         self.room_table = QTableWidget()
+        self.room_table.setColumnCount(8)  # Updated for separate Edit and Delete columns
+        self.room_table.setHorizontalHeaderLabels([
+            "Room ID", "Room Name", "Room Type", "Room Size", "Rental Price",
+            "Occupancy Status", "Action Edit", "Action Delete"
+        ])
 
-        # Buttons for room management
-        self.add_room_btn = QPushButton("Add Room")
-        self.add_room_btn.clicked.connect(self.open_add_room_view)
+        # Apply table styling
+        self.room_table.setStyleSheet(
+            """
+            QTableWidget::item { text-align: center; }
+            QHeaderView::section { font-size: 16px; font-weight: bold; text-align: center; }
+            """
+        )
+
+        # Enable horizontal scrolling
+        self.room_table.setHorizontalScrollMode(QTableWidget.ScrollMode.ScrollPerPixel)
+        self.room_table.setSizeAdjustPolicy(QTableWidget.SizeAdjustPolicy.AdjustToContents)
+        self.room_table.horizontalScrollBar().setVisible(True)
+
+        # Adjust column width and row height
+        self.room_table.horizontalHeader().setDefaultSectionSize(150)  # Set default width for columns
+        self.room_table.verticalHeader().setDefaultSectionSize(40)  # Set default height for rows
+        self.room_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)  # Allow column resizing
+
+        self.layout.addWidget(self.room_table)
+
+        # Buttons
+        button_layout = QHBoxLayout()
 
         self.refresh_btn = QPushButton("Refresh")
-        self.refresh_btn.clicked.connect(self.refresh_data)  # Reload room data
+        self.refresh_btn.setStyleSheet("font-size: 14px; padding: 10px;")
+        self.refresh_btn.clicked.connect(self.load_rooms)
+        button_layout.addWidget(self.refresh_btn)
 
-        for widget in [self.room_table, self.add_room_btn, self.refresh_btn]:
-            self.layout.addWidget(widget)
+        self.add_room_btn = QPushButton("Add Room")
+        self.add_room_btn.setStyleSheet("font-size: 14px; padding: 10px;")
+        self.add_room_btn.clicked.connect(self.open_add_room_view)
+        button_layout.addWidget(self.add_room_btn)
 
+        self.layout.addLayout(button_layout)
         self.setLayout(self.layout)
-        self.load_rooms()
 
-    def refresh_data(self):
-        """Reload room data."""
         self.load_rooms()
 
     def load_rooms(self):
-        from controllers.room_controller import fetch_rooms  # Updated controller for fetching rooms
-        rooms = fetch_rooms()  # Fetch room data from the controller
+        """Fetch and display all rooms."""
+        try:
+            rooms = fetch_rooms()
+            if not rooms:
+                QMessageBox.information(self, "Info", "No rooms found.")
+                self.room_table.setRowCount(0)  # Clear any existing rows
+                return
+            self.populate_table(rooms)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to load rooms: {e}")
 
-        # Begin smooth table update
-        self.room_table.setUpdatesEnabled(False)
-        self.room_table.clearContents()
-        self.room_table.setRowCount(0)
+    def populate_table(self, rooms):
+        """Populate the table with room data."""
+        self.room_table.setRowCount(0)  # Clear existing rows
 
-        # Set the correct column headers, including Edit and Delete actions
-        self.room_table.setColumnCount(7)  # Adjusted for Edit and Delete columns
-        self.room_table.setHorizontalHeaderLabels(
-            ["ID", "Room Name", "Room Type", "Room Size", "Rental Price", "Occupancy Status", "Actions"]
-        )
+        # Set font for table rows
+        row_font = QFont()
+        row_font.setPointSize(14)  # Set font size for row values
 
-        # Populate table
         for row_data in rooms:
             row = self.room_table.rowCount()
             self.room_table.insertRow(row)
 
-            # Map each value from `row_data` to its corresponding column
-            for col, data in enumerate(row_data[:6]):  # Ensure only the first 6 columns are populated
-                self.room_table.setItem(row, col, QTableWidgetItem(str(data)))
+            # Populate all columns with room data (excluding actions)
+            for col, data in enumerate(row_data[:6]):
+                item = QTableWidgetItem(str(data) if data is not None else "N/A")
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)  # Center-align text
+                item.setFont(row_font)  # Apply the font to the row item
+                self.room_table.setItem(row, col, item)
 
-            # Add Edit and Delete buttons in the Actions column
-            actions_widget = QWidget()
-            actions_layout = QVBoxLayout()
-            actions_layout.setContentsMargins(0, 0, 0, 0)
+            # Add action buttons
+            self.add_edit_action(row, row_data)
+            self.add_delete_action(row, row_data)
 
-            # Edit button
-            edit_btn = QPushButton("Edit")
-            edit_btn.clicked.connect(partial(self.open_edit_room_view, row_data))
-            actions_layout.addWidget(edit_btn)
+    def add_edit_action(self, row, row_data):
+        """Add the Edit button to the table."""
+        edit_btn = QPushButton("Edit Room")
+        edit_btn.setStyleSheet("font-size: 14px; padding: 5px;")
+        edit_btn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
+        edit_btn.clicked.connect(partial(self.open_edit_room_view, row_data))
+        self.room_table.setCellWidget(row, 6, edit_btn)  # Place in the "Action Edit" column
 
-            # Delete button
-            delete_btn = QPushButton("Delete")
-            delete_btn.clicked.connect(partial(self.delete_room_action, row_data[0]))
-            actions_layout.addWidget(delete_btn)
-
-            actions_widget.setLayout(actions_layout)
-            self.room_table.setCellWidget(row, 6, actions_widget)
-
-        # Resize columns to fit content
-        self.room_table.resizeColumnsToContents()
-
-        # Re-enable updates
-        self.room_table.setUpdatesEnabled(True)
+    def add_delete_action(self, row, row_data):
+        """Add the Delete button to the table."""
+        delete_btn = QPushButton("Delete Room")
+        delete_btn.setStyleSheet("font-size: 14px; padding: 5px;")
+        delete_btn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
+        delete_btn.clicked.connect(partial(self.delete_room_action, row_data[0]))
+        self.room_table.setCellWidget(row, 7, delete_btn)  # Place in the "Action Delete" column
 
     def delete_room_action(self, room_id):
+        """Delete a room."""
         from controllers.room_controller import delete_room
         try:
-            # Call the controller to delete the room
             delete_room(room_id)
-            print(f"Room ID {room_id} deleted successfully!")
-            self.load_rooms()  # Refresh table after deletion
+            QMessageBox.information(self, "Success", f"Room ID {room_id} deleted successfully!")
+            self.load_rooms()
         except Exception as e:
-            print(f"Failed to delete Room ID {room_id}: {e}")
-
+            QMessageBox.critical(self, "Error", f"Failed to delete Room ID {room_id}: {e}")
+    
     def open_edit_room_view(self, room_data):
-        from views.edit_room import EditRoomView
+        """Open the edit room dialog."""
         current_data = {
-            'name': str(room_data[1]),
-            'type': str(room_data[2]),
-            'size': str(room_data[3]),
-            'rental_price': str(room_data[4]),
-            'occupancy_status': str(room_data[5])
+            'name': str(room_data[1]),  # Room Name
+            'type': str(room_data[2]),  # Room Type
+            'size': str(room_data[3]),  # Room Size
+            'rental_price': str(room_data[4]),  # Rental Price
+            'amenities': str(room_data[6]) if len(room_data) > 6 else ""  # Amenities
         }
-        self.edit_room_view = EditRoomView(room_data[0], current_data)
-        self.edit_room_view.show()
+        from views.edit_room import EditRoomView
+        dialog = EditRoomView(room_data[0], current_data)  # Pass Room ID and current data
+        if dialog.exec():
+            self.load_rooms()  # Reload rooms after editing
+
 
     def open_add_room_view(self):
+        """Open the add room dialog."""
         from views.add_room import AddRoomView
-        self.add_room_view = AddRoomView()
-        self.add_room_view.show()
+        dialog = AddRoomView(self)
+        if dialog.exec():
+            self.load_rooms()
+
+

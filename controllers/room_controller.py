@@ -19,23 +19,39 @@ def add_room(name, room_type, size, rental_price, amenities):
         connection.close()
 
 
-def update_room(room_id, name, room_type, size, rental_price, amenities):
-    """Update room details."""
-    connection = sqlite3.connect('rental_management_v2.db')
+# def update_room(room_id, name, room_type, size, rental_price, amenities):
+#     """Update room details."""
+#     connection = sqlite3.connect('rental_management_v2.db')
+#     cursor = connection.cursor()
+#     try:
+#         cursor.execute("""
+#         UPDATE Room
+#         SET name = ?, type = ?, size = ?, rental_price = ?, amenities = ?
+#         WHERE id = ?
+#         """, (name, room_type, size, rental_price, amenities, room_id))
+#         connection.commit()
+#     except sqlite3.IntegrityError as e:
+#         print(f"Error updating room: {e}")
+#         raise
+#     finally:
+#         connection.close()
+
+def update_room(room_id, name, room_type, size, rental_price, amenities, occupancy_status):
+    connection = sqlite3.connect('rental_management_v2.db')  # Replace with your database file name
     cursor = connection.cursor()
     try:
+        # Update query to include `occupancy_status`
         cursor.execute("""
         UPDATE Room
-        SET name = ?, type = ?, size = ?, rental_price = ?, amenities = ?
-        WHERE id = ?
-        """, (name, room_type, size, rental_price, amenities, room_id))
+        SET name = ?, type = ?, size = ?, rental_price = ?, amenities = ?, occupancy_status = ?
+        WHERE id = ?;
+        """, (name, room_type, size, rental_price, amenities, occupancy_status, room_id))
         connection.commit()
-    except sqlite3.IntegrityError as e:
+    except Exception as e:
         print(f"Error updating room: {e}")
         raise
     finally:
         connection.close()
-
 
 def delete_room(room_id):
     """Delete a room."""
