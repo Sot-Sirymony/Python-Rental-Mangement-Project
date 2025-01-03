@@ -1,144 +1,149 @@
+
+
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QLabel, QLineEdit, QComboBox, QDateEdit, QTextEdit, QPushButton, QMessageBox
+    QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QDateEdit, QLineEdit, QPushButton, QDialog, QMessageBox
 )
-from PyQt6.QtCore import QDate
-from controllers.payment_controller import add_payment, fetch_payment_methods, fetch_payment_statuses
+from PyQt6.QtCore import Qt, QDate
+from controllers.payment_management_controller import create_payment, fetch_available_rooms, fetch_tenants
+
 
 class AddPaymentView(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Add New Payment")
-        self.resize(400, 400)
-        self.setModal(True)  # Make the dialog modal
-
+        self.setWindowTitle("Add Payment")
         self.layout = QVBoxLayout()
 
-        # Tenant Selector
-        self.layout.addWidget(QLabel("Select Tenant"))
+        # Tenant Selection
+        tenant_label = QLabel("Select Tenant:")
+        tenant_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(tenant_label)
+
         self.tenant_selector = QComboBox()
-        self.load_tenants()  # Populate tenant dropdown
+        self.tenant_selector.setStyleSheet("font-size: 14px;")
+        self.load_tenants()
         self.layout.addWidget(self.tenant_selector)
 
-        # Room Selector
-        self.layout.addWidget(QLabel("Select Room"))
+        # Room Selection
+        room_label = QLabel("Select Room:")
+        room_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(room_label)
+
         self.room_selector = QComboBox()
-        self.load_rooms()  # Populate room dropdown
+        self.room_selector.setStyleSheet("font-size: 14px;")
+        self.load_rooms()
         self.layout.addWidget(self.room_selector)
 
-        # Payment Amount
-        self.layout.addWidget(QLabel("Payment Amount"))
+        # Amount
+        amount_label = QLabel("Amount:")
+        amount_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(amount_label)
+
         self.amount_input = QLineEdit()
-        self.amount_input.setPlaceholderText("Enter payment amount")
+        self.amount_input.setStyleSheet("font-size: 14px;")
         self.layout.addWidget(self.amount_input)
 
-        # Payment Method
-        self.layout.addWidget(QLabel("Payment Method"))
-        self.method_selector = QComboBox()
-        self.populate_payment_methods()  # Dynamically load methods
-        self.layout.addWidget(self.method_selector)
-
         # Payment Date
-        self.layout.addWidget(QLabel("Payment Date"))
-        self.date_input = QDateEdit()
-        self.date_input.setCalendarPopup(True)
-        self.date_input.setDisplayFormat("yyyy-MM-dd")
-        self.date_input.setDate(QDate.currentDate())  # Default to current date
-        self.layout.addWidget(self.date_input)
+        payment_date_label = QLabel("Payment Date:")
+        payment_date_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(payment_date_label)
 
-        # Due Date (Optional)
-        self.layout.addWidget(QLabel("Due Date (Optional)"))
+        self.payment_date_input = QDateEdit()
+        self.payment_date_input.setCalendarPopup(True)
+        self.payment_date_input.setDate(QDate.currentDate())
+        self.payment_date_input.setStyleSheet("font-size: 14px;")
+        self.layout.addWidget(self.payment_date_input)
+
+        # Due Date
+        due_date_label = QLabel("Due Date:")
+        due_date_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(due_date_label)
+
         self.due_date_input = QDateEdit()
         self.due_date_input.setCalendarPopup(True)
-        self.due_date_input.setDisplayFormat("yyyy-MM-dd")
+        self.due_date_input.setStyleSheet("font-size: 14px;")
         self.layout.addWidget(self.due_date_input)
 
-        # Payment Reference (Optional)
-        self.layout.addWidget(QLabel("Payment Reference (Optional)"))
-        self.reference_input = QTextEdit()
-        self.reference_input.setPlaceholderText("Enter reference if any")
+        # Method
+        method_label = QLabel("Payment Method:")
+        method_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(method_label)
+
+        self.method_input = QComboBox()
+        self.method_input.addItems(["Cash", "Bank Transfer", "Check"])
+        self.method_input.setStyleSheet("font-size: 14px;")
+        self.layout.addWidget(self.method_input)
+
+        # Reference Number
+        reference_label = QLabel("Reference Number:")
+        reference_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(reference_label)
+
+        self.reference_input = QLineEdit()
+        self.reference_input.setStyleSheet("font-size: 14px;")
         self.layout.addWidget(self.reference_input)
 
-        # Payment Status
-        self.layout.addWidget(QLabel("Payment Status"))
-        self.status_selector = QComboBox()
-        self.populate_payment_statuses()  # Dynamically load statuses
-        self.layout.addWidget(self.status_selector)
+        # Notes
+        notes_label = QLabel("Notes:")
+        notes_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(notes_label)
 
-        # Save Button
+        self.notes_input = QLineEdit()
+        self.notes_input.setStyleSheet("font-size: 14px;")
+        self.layout.addWidget(self.notes_input)
+
+        # Buttons
+        button_layout = QHBoxLayout()
         self.save_btn = QPushButton("Save Payment")
+        self.save_btn.setStyleSheet("font-size: 14px; font-weight: bold; padding: 6px;")
         self.save_btn.clicked.connect(self.save_payment)
-        self.layout.addWidget(self.save_btn)
+        button_layout.addWidget(self.save_btn)
 
+        self.cancel_btn = QPushButton("Cancel")
+        self.cancel_btn.setStyleSheet("font-size: 14px; font-weight: bold; padding: 6px;")
+        self.cancel_btn.clicked.connect(self.reject)
+        button_layout.addWidget(self.cancel_btn)
+
+        self.layout.addLayout(button_layout)
         self.setLayout(self.layout)
 
-    def load_tenants(self):
-        """Load tenants into the tenant dropdown."""
-        from controllers.tenant_controller import fetch_tenants
-        tenants = fetch_tenants()
-        if tenants:
-            for tenant in tenants:
-                self.tenant_selector.addItem(f"{tenant[1]} {tenant[2]}", tenant[0])  # Display full name, store tenant_id
-        else:
-            self.tenant_selector.addItem("No tenants found", None)
-
     def load_rooms(self):
-        """Load rooms into the room dropdown."""
-        from controllers.room_controller import fetch_available_rooms
-        rooms = fetch_available_rooms()
-        if rooms:
+        """Load available rooms into the dropdown."""
+        try:
+            rooms = fetch_available_rooms()
             for room in rooms:
-                self.room_selector.addItem(f"{room[1]} ({room[0]})", room[0])  # Display room name/ID, store room_id
-        else:
-            self.room_selector.addItem("No rooms found", None)
+                self.room_selector.addItem(f"{room[1]} (ID: {room[0]})", room[0])  # Display name, store ID
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to load rooms: {e}")
 
-    def populate_payment_methods(self):
-        """Dynamically load payment methods."""
-        methods = fetch_payment_methods()
-        if methods:
-            self.method_selector.addItems(methods)
-        else:
-            self.method_selector.addItem("No methods available")
-
-    def populate_payment_statuses(self):
-        """Dynamically load payment statuses."""
-        statuses = fetch_payment_statuses()
-        if statuses:
-            self.status_selector.addItems(statuses)
-        else:
-            self.status_selector.addItem("No statuses available")
+    def load_tenants(self):
+        """Load tenants into the dropdown."""
+        try:
+            tenants = fetch_tenants()
+            for tenant in tenants:
+                self.tenant_selector.addItem(f"{tenant[1]} (ID: {tenant[0]})", tenant[0])  # Display name, store ID
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to load tenants: {e}")
 
     def save_payment(self):
-        """Save the payment data to the database."""
+        """Save the payment."""
         tenant_id = self.tenant_selector.currentData()
         room_id = self.room_selector.currentData()
-        amount = self.amount_input.text().strip()
-        method = self.method_selector.currentText()
-        date = self.date_input.date().toString("yyyy-MM-dd")
-        due_date = self.due_date_input.date().toString("yyyy-MM-dd") if self.due_date_input.date() else None
-        reference = self.reference_input.toPlainText().strip()
-        status = self.status_selector.currentText()
+        amount = self.amount_input.text()
+        date = self.payment_date_input.date().toString("yyyy-MM-dd")
+        due_date = self.due_date_input.date().toString("yyyy-MM-dd")
+        method = self.method_input.currentText()
+        reference = self.reference_input.text()
+        notes = self.notes_input.text()
 
-        # Validation
-        if not tenant_id:
-            QMessageBox.warning(self, "Validation Error", "Please select a tenant.")
-            return
-        if not room_id:
-            QMessageBox.warning(self, "Validation Error", "Please select a room.")
-            return
-        if not amount or not amount.replace(".", "", 1).isdigit() or float(amount) <= 0:
-            QMessageBox.warning(self, "Validation Error", "Please enter a valid payment amount (positive number).")
-            return
-        if due_date and due_date < date:
-            QMessageBox.warning(self, "Validation Error", "Due date must not be earlier than payment date.")
+        if not tenant_id or not room_id or not amount:
+            QMessageBox.warning(self, "Validation Error", "All fields are required.")
             return
 
         try:
-            # Save payment using the controller
-            add_payment(tenant_id, room_id, float(amount), date, method, reference, due_date, status)
-            QMessageBox.information(self, "Success", "Payment added successfully!")
-            if self.parent():
-                self.parent().load_payments()  # Refresh parent view
-            self.accept()  # Close the dialog
+            create_payment(tenant_id, room_id, float(amount), date, due_date, method, reference, notes)
+            QMessageBox.information(self, "Success", "Payment recorded successfully!")
+            self.accept()
         except Exception as e:
-            print(f"Error adding payment: {e}")
-            QMessageBox.critical(self, "Error", f"Failed to add payment: {e}")
+            QMessageBox.critical(self, "Error", f"Failed to record payment: {e}")
+
+

@@ -7,7 +7,6 @@ from views.dashboard import Dashboard  # Main dashboard
 from views.room_management import RoomManagement
 from views.tenant_management import TenantManagement
 from views.payment_management import PaymentManagement
-from views.booking_management import BookingManagement  # Import Booking Management
 from views.lease_management import LeaseManagement
 
 class MainWindow(QMainWindow):
@@ -26,7 +25,6 @@ class MainWindow(QMainWindow):
         self.tenant_management = TenantManagement()
         self.lease_management = LeaseManagement()
         self.payment_management = PaymentManagement()
-        self.booking_management = BookingManagement()  # Initialize Booking Management
         
         self.dashboard = Dashboard()
 
@@ -36,7 +34,6 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.tenant_management)
         self.central_widget.addWidget(self.lease_management)
         self.central_widget.addWidget(self.payment_management)
-        self.central_widget.addWidget(self.booking_management)  # Add Booking Management to stack
         self.central_widget.addWidget(self.dashboard)
 
         # Sidebar Navigation
@@ -61,12 +58,11 @@ class MainWindow(QMainWindow):
         property_room_btn = create_button("Rooms Module", lambda: self.central_widget.setCurrentWidget(self.room_management))
         tenant_btn = create_button("Tenants Module", lambda: self.central_widget.setCurrentWidget(self.tenant_management))
         lease_btn = create_button("Lease Module", lambda: self.central_widget.setCurrentWidget(self.lease_management))
-        payment_btn = create_button("Payments Module", lambda: self.central_widget.setCurrentWidget(self.payment_management))
-        booking_btn = create_button("Bookings Module", lambda: self.central_widget.setCurrentWidget(self.booking_management))  # Booking Button
+        payment_btn = create_button("Payments Module", lambda: self.central_widget.setCurrentWidget(self.payment_management))  # Booking Button
         dashboard_btn = create_button("Dashboard", lambda: self.central_widget.setCurrentWidget(self.dashboard))
 
         # Add buttons to the layout
-        for btn in [property_room_btn, tenant_btn,lease_btn,payment_btn, booking_btn, dashboard_btn]:
+        for btn in [property_room_btn, tenant_btn,lease_btn,payment_btn, dashboard_btn]:
             layout.addWidget(btn)
 
         container.setLayout(layout)
