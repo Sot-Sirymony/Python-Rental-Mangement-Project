@@ -22,6 +22,16 @@ class RoomManagement(QWidget):
             "Room ID", "Room Name", "Room Type", "Room Size", "Rental Price",
             "Occupancy Status", "Action Edit", "Action Delete"
         ])
+        
+        # Adjust column width for each column
+        self.room_table.setColumnWidth(0, 100)  # Room ID
+        self.room_table.setColumnWidth(1, 240)  # Room Name
+        self.room_table.setColumnWidth(2, 150)  # Room Type
+        self.room_table.setColumnWidth(3, 120)  # Room Size
+        self.room_table.setColumnWidth(4, 170)  # Rental Price
+        self.room_table.setColumnWidth(5, 180)  # Occupancy Status
+        self.room_table.setColumnWidth(6, 120)  # Action Edit
+        self.room_table.setColumnWidth(7, 120)  # Action Delete
 
         # Apply table styling
         self.room_table.setStyleSheet(
@@ -47,12 +57,12 @@ class RoomManagement(QWidget):
         button_layout = QHBoxLayout()
 
         self.refresh_btn = QPushButton("Refresh")
-        self.refresh_btn.setStyleSheet("font-size: 14px; padding: 10px;")
+        self.refresh_btn.setStyleSheet("font-size: 14px; font-weight:bold; padding: 10px;")
         self.refresh_btn.clicked.connect(self.load_rooms)
         button_layout.addWidget(self.refresh_btn)
 
         self.add_room_btn = QPushButton("Add Room")
-        self.add_room_btn.setStyleSheet("font-size: 14px; padding: 10px;")
+        self.add_room_btn.setStyleSheet("font-size: 14px;font-weight:bold; padding: 10px;")
         self.add_room_btn.clicked.connect(self.open_add_room_view)
         button_layout.addWidget(self.add_room_btn)
 
@@ -99,7 +109,7 @@ class RoomManagement(QWidget):
     def add_edit_action(self, row, row_data):
         """Add the Edit button to the table."""
         edit_btn = QPushButton("Edit Room")
-        edit_btn.setStyleSheet("font-size: 14px; padding: 5px;")
+        edit_btn.setStyleSheet("font-size: 14px;font-weight:bold; padding: 5px;")
         edit_btn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
         edit_btn.clicked.connect(partial(self.open_edit_room_view, row_data))
         self.room_table.setCellWidget(row, 6, edit_btn)  # Place in the "Action Edit" column
@@ -107,7 +117,7 @@ class RoomManagement(QWidget):
     def add_delete_action(self, row, row_data):
         """Add the Delete button to the table."""
         delete_btn = QPushButton("Delete Room")
-        delete_btn.setStyleSheet("font-size: 14px; padding: 5px;")
+        delete_btn.setStyleSheet("font-size: 14px; font-weight:bold; padding: 5px;")
         delete_btn.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
         delete_btn.clicked.connect(partial(self.delete_room_action, row_data[0]))
         self.room_table.setCellWidget(row, 7, delete_btn)  # Place in the "Action Delete" column

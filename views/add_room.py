@@ -15,7 +15,7 @@ class AddRoomView(QDialog):
         self.layout = QVBoxLayout()
 
         # Shared stylesheet for labels
-        label_style = "font-size: 16px;"
+        label_style = "font-size: 16px; font-weight:bold;"
 
         # Room Name
         room_name_label = QLabel("Room Name/Number")

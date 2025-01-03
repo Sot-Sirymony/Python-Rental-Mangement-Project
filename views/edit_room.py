@@ -17,7 +17,7 @@ class EditRoomView(QDialog):
         self.layout.addWidget(self.error_label)
 
         # Shared stylesheet for labels
-        label_style = "font-size: 16px;"
+        label_style = "font-size: 16px;font-weight:bold;"
 
         # Room Name
         name_label = QLabel("Room Name:")
