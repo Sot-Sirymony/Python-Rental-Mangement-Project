@@ -37,9 +37,9 @@ class MainWindow(QMainWindow):
         self.dashboard = Dashboard()
 
         # Add Views to Stack
-        self.central_widget.addWidget(self.dashboard)
+        # self.central_widget.addWidget(self.dashboard)
         self.central_widget.addWidget(self.room_management)
-        # self.central_widget.addWidget(self.tenant_management)
+        self.central_widget.addWidget(self.tenant_management)
         self.central_widget.addWidget(self.lease_management)
         self.central_widget.addWidget(self.payment_management)
         self.central_widget.addWidget(self.room_report)
@@ -73,11 +73,11 @@ class MainWindow(QMainWindow):
         # tenant_report_btn = create_button("Tenant Report", lambda: self.central_widget.setCurrentWidget(self.tenant_report))
         # lease_report_btn = create_button("Lease Report", lambda: self.central_widget.setCurrentWidget(self.lease_report))
         # payment_report_btn = create_button("Payment Report", lambda: self.central_widget.setCurrentWidget(self.payment_report))
-        dashboard_btn = create_button("Dashboard", lambda: self.central_widget.setCurrentWidget(self.dashboard))
+        # dashboard_btn = create_button("Dashboard", lambda: self.central_widget.setCurrentWidget(self.dashboard))
 
         # Add buttons to the layout
         #for btn in [dashboard_btn, property_room_btn, tenant_btn, lease_btn, payment_btn, room_report_btn, tenant_report_btn, lease_report_btn, payment_report_btn]:
-        for btn in [dashboard_btn, property_room_btn, tenant_btn, lease_btn, payment_btn, room_report_btn]:
+        for btn in [ property_room_btn, tenant_btn, lease_btn, payment_btn, room_report_btn]:
         
             layout.addWidget(btn)
  
