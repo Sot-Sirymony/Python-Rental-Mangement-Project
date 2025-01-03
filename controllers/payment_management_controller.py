@@ -1,4 +1,5 @@
 import sqlite3
+import pandas as pd
 
 DATABASE = "rental_management_v2.db"
 
@@ -132,4 +133,36 @@ def fetch_tenants():
         print(f"Error fetching tenants: {e}")
         return []
     finally:
-        connection.close()        
+        connection.close()  
+         
+## for mapyemnt_report_controller        
+def fetch_payment_data():
+    """Fetch detailed payment data for Payment Report."""
+    connection = sqlite3.connect(DATABASE)
+    try:
+        query = """
+        SELECT 
+            p.id AS payment_id,
+            r.id AS room_id,
+            r.name AS room_name,
+            t.id AS tenant_id,
+            t.first_name || ' ' || t.last_name AS tenant_name,
+            p.amount AS amount_paid,
+            p.due_date,
+            p.date AS payment_date,
+            p.payment_status AS status,
+            (CASE 
+                WHEN p.payment_status = 'Overdue' THEN p.amount 
+                ELSE 0 
+            END) AS overdue_amount
+        FROM Payment p
+        JOIN Room r ON p.room_id = r.id
+        JOIN Tenant t ON p.tenant_id = t.id
+        """
+        df = pd.read_sql_query(query, connection)
+        return df
+    except Exception as e:
+        print(f"Error fetching payment data for report: {e}")
+        return pd.DataFrame()  # Return empty DataFrame on error
+    finally:
+        connection.close()             

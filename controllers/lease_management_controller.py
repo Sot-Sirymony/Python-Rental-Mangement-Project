@@ -1,5 +1,5 @@
 import sqlite3
-
+import pandas as pd
 DATABASE = "rental_management_v2.db"
 
 def fetch_leases():
@@ -159,6 +159,69 @@ def update_lease(lease_id, start_date, end_date, status):
         raise
     finally:
         connection.close()
+        
+  ## for report
+# def fetch_lease_data():
+#     """Fetch detailed lease data for the Lease Report."""
+#     connection = sqlite3.connect(DATABASE)
+#     try:
+#         query = """
+#         SELECT
+#             l.id AS lease_id,
+#             r.name AS room_name,
+#             t.first_name || ' ' || t.last_name AS tenant_name,
+#             l.start_date,
+#             l.end_date,
+#             l.status,
+#             (julianday(l.end_date) - julianday(l.start_date)) AS lease_duration,
+#             CASE
+#                 WHEN l.status = 'Active' THEN 1
+#                 ELSE 0
+#             END AS active_lease_flag
+#         FROM Lease l
+#         JOIN Room r ON l.room_id = r.id
+#         JOIN Tenant t ON l.tenant_id = t.id
+#         """
+#         df = pd.read_sql_query(query, connection)
+#         return df
+#     except Exception as e:
+#         print(f"Error fetching lease data for report: {e}")
+#         return pd.DataFrame()  # Return empty DataFrame on error
+#     finally:
+#         connection.close()    
+
+
+def fetch_lease_data():
+    """Fetch detailed lease data for the Lease Report."""
+    connection = sqlite3.connect(DATABASE)
+    try:
+        query = """
+        SELECT
+            l.id AS lease_id,
+            r.id AS room_id,  -- Explicitly select room_id
+            r.name AS room_name,
+            t.first_name || ' ' || t.last_name AS tenant_name,
+            t.id AS tenant_id,
+            l.start_date,
+            l.end_date,
+            l.status,
+            (julianday(l.end_date) - julianday(l.start_date)) AS lease_duration,
+            CASE
+                WHEN l.status = 'Active' THEN 1
+                ELSE 0
+            END AS active_lease_flag
+        FROM Lease l
+        JOIN Room r ON l.room_id = r.id
+        JOIN Tenant t ON l.tenant_id = t.id
+        """
+        df = pd.read_sql_query(query, connection)
+        return df
+    except Exception as e:
+        print(f"Error fetching lease data for report: {e}")
+        return pd.DataFrame()  # Return empty DataFrame on error
+    finally:
+        connection.close()
+  
         
            
         

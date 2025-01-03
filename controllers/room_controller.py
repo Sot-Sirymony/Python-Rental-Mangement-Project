@@ -1,10 +1,12 @@
 
 
 import sqlite3
+import pandas as pd
+DATABASE = "rental_management_v2.db"
 
 def add_room(name, room_type, size, rental_price, amenities):
     """Add a new room."""
-    connection = sqlite3.connect('rental_management_v2.db')
+    connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
     try:
         cursor.execute("""
@@ -20,7 +22,7 @@ def add_room(name, room_type, size, rental_price, amenities):
 
 
 def update_room(room_id, name, room_type, size, rental_price, amenities, occupancy_status):
-    connection = sqlite3.connect('rental_management_v2.db')  # Replace with your database file name
+    connection = sqlite3.connect(DATABASE)  # Replace with your database file name
     cursor = connection.cursor()
     try:
         # Update query to include `occupancy_status`
@@ -38,7 +40,7 @@ def update_room(room_id, name, room_type, size, rental_price, amenities, occupan
 
 def delete_room(room_id):
     """Delete a room."""
-    connection = sqlite3.connect('rental_management_v2.db')
+    connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
     try:
         cursor.execute("DELETE FROM Room WHERE id = ?", (room_id,))
@@ -52,7 +54,7 @@ def delete_room(room_id):
 
 def fetch_rooms():
     """Fetch all room details."""
-    connection = sqlite3.connect('rental_management_v2.db')
+    connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
     try:
         cursor.execute("""
@@ -71,7 +73,7 @@ def fetch_rooms():
 
 def fetch_available_rooms():
     """Fetch available rooms."""
-    connection = sqlite3.connect('rental_management_v2.db')
+    connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
     try:
         cursor.execute("""
@@ -90,7 +92,7 @@ def fetch_available_rooms():
 
 def fetch_room_details_with_booking():
     """Fetch room details with booking information."""
-    connection = sqlite3.connect('rental_management_v2.db')
+    connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
     try:
         cursor.execute("""
@@ -116,6 +118,39 @@ def fetch_room_details_with_booking():
         return []
     finally:
         connection.close()
+        
+        
+def fetch_room_data():
+    """Fetch detailed room data for the Payment Report."""
+    connection = sqlite3.connect(DATABASE)
+    try:
+        query = """
+        SELECT 
+            r.id AS room_id,
+            r.name AS room_name,
+            r.type AS room_type,
+            r.rental_price,
+            r.occupancy_status,
+            r.size AS room_size,
+            r.amenities,
+            (SELECT SUM(p.amount) 
+             FROM Payment p 
+             WHERE p.room_id = r.id) AS total_rent_collected,
+            (SELECT COUNT(*) 
+             FROM Lease l 
+             WHERE l.room_id = r.id AND l.status = 'Active') AS active_lease_count,
+            (SELECT COUNT(*) 
+             FROM Payment p 
+             WHERE p.room_id = r.id AND p.payment_status = 'Overdue') AS overdue_payments
+        FROM Room r
+        """
+        df = pd.read_sql_query(query, connection)
+        return df
+    except Exception as e:
+        print(f"Error fetching room data for report: {e}")
+        return pd.DataFrame()  # Return empty DataFrame on error
+    finally:
+        connection.close()        
 
 
         
