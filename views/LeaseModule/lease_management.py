@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from controllers.lease_management_controller import fetch_leases, cancel_lease, delete_lease
-from views.add_lease import AddLeaseView
+from views.LeaseModule.add_lease import AddLeaseView
 
 
 class LeaseManagement(QWidget):
@@ -84,7 +84,7 @@ class LeaseManagement(QWidget):
     
     def edit_lease(self, lease):
         """Open Edit Lease dialog."""
-        from views.edit_lease import EditLeaseView
+        from views.LeaseModule.edit_lease import EditLeaseView
         dialog = EditLeaseView(lease, self)
         if dialog.exec():
             self.load_leases()

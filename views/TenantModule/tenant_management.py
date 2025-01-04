@@ -133,14 +133,14 @@ class TenantManagement(QWidget):
 
     def open_add_tenant_view(self):
         """Open add tenant view."""
-        from views.add_tenant import AddTenantView
+        from views.TenantModule.add_tenant import AddTenantView
         dialog = AddTenantView(self)
         if dialog.exec():
             self.load_tenants()
 
     def open_edit_tenant_view(self, tenant_data):
         """Open edit tenant view."""
-        from views.edit_tenant import EditTenantView
+        from views.TenantModule.edit_tenant import EditTenantView
         dialog = EditTenantView(tenant_data, self)
         if dialog.exec():
             self.load_tenants()

@@ -7,8 +7,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from controllers.payment_management_controller import fetch_payments, create_payment, update_payment, delete_payment
-from views.add_payment import AddPaymentView
-from views.edit_payment import EditPaymentView
+from views.PaymentModule.add_payment import AddPaymentView
+from views.PaymentModule.edit_payment import EditPaymentView
 
 
 class PaymentManagement(QWidget):

@@ -141,7 +141,7 @@ class RoomManagement(QWidget):
             'rental_price': str(room_data[4]),  # Rental Price
             'amenities': str(room_data[6]) if len(room_data) > 6 else ""  # Amenities
         }
-        from views.edit_room import EditRoomView
+        from views.RoomModule.edit_room import EditRoomView
         dialog = EditRoomView(room_data[0], current_data)  # Pass Room ID and current data
         if dialog.exec():
             self.load_rooms()  # Reload rooms after editing
@@ -149,7 +149,7 @@ class RoomManagement(QWidget):
 
     def open_add_room_view(self):
         """Open the add room dialog."""
-        from views.add_room import AddRoomView
+        from views.RoomModule.add_room import AddRoomView
         dialog = AddRoomView(self)
         if dialog.exec():
             self.load_rooms()
