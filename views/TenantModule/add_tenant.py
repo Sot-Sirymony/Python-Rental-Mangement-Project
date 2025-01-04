@@ -89,7 +89,7 @@ class AddTenantView(QDialog):
             return
 
         # Call the controller to save the tenant
-        from controllers.tenant_controller import add_tenant
+        from controllers.SqlLiteControllers.tenant_controller import add_tenant
         try:
             add_tenant(first_name, last_name, phone, email)
             print("Tenant added successfully!")
