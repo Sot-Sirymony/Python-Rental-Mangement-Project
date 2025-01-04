@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QDateEdit, QLineEdit, QPushButton, QDialog, QMessageBox
 )
 from PyQt6.QtCore import Qt, QDate
-from controllers.SqlLiteControllers.payment_management_controller import create_payment, fetch_available_rooms, fetch_tenants
+from controllers.PostGreSqlControllers.payment_management_controller import create_payment, fetch_available_rooms, fetch_tenants
 
 
 class AddPaymentView(QDialog):

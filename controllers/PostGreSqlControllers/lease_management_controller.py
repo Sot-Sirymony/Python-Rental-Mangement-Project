@@ -31,6 +31,49 @@ def fetch_leases():
     finally:
         cursor.close()
         connection.close()
+# def fetch_available_rooms():
+#     """Fetch all available rooms using a PostgreSQL stored procedure."""
+#     try:
+#         connection = psycopg2.connect(**DATABASE)
+#         cursor = connection.cursor()
+#         cursor.callproc('fetch_available_rooms')
+#         return cursor.fetchall()
+#     except Exception as e:
+#         print(f"Error fetching available rooms: {e}")
+#         return []
+#     finally:
+#         if connection:
+#             connection.close()
+#fetch from view 
+def fetch_available_rooms():
+    """Fetch all available rooms from the 'availablerooms' view."""
+    try:
+        connection = psycopg2.connect(**DATABASE)
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM availablerooms")  # Query the view directly
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error fetching available rooms: {e}")
+        return []
+    finally:
+        if connection:
+            connection.close()
+
+            
+def fetch_tenants():
+    """Fetch all tenants using a PostgreSQL stored procedure."""
+    try:
+        connection = psycopg2.connect(**DATABASE)
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM tenantview')
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error fetching tenants: {e}")
+        return []
+    finally:
+        if connection:
+            connection.close()
+          
 
 def cancel_lease(lease_id):
     """Cancel a lease."""
@@ -60,18 +103,30 @@ def delete_lease(lease_id):
         cursor.close()
         connection.close()
 
+
 def create_lease(room_id, tenant_id, start_date, end_date):
     """Create a new lease."""
     connection = get_connection()
     cursor = connection.cursor()
     try:
-        cursor.execute("SELECT create_lease(%s, %s, %s, %s);",
-                       (room_id, tenant_id, start_date, end_date))
+        # Debugging inputs
+        print(f"Debug: room_id={room_id}, tenant_id={tenant_id}, start_date={start_date}, end_date={end_date}")
+        
+        # Call the stored procedure
+        cursor.execute("""
+            SELECT create_lease(%s::INTEGER, %s::INTEGER, %s::DATE, %s::DATE);
+        """, (room_id, tenant_id, start_date, end_date))
+        
+        # Commit the transaction
         connection.commit()
+        print("Lease created successfully!")
     except Exception as e:
+        # Rollback on error and display detailed error message
+        connection.rollback()
         print(f"Error creating lease: {e}")
         raise
     finally:
+        # Close resources
         cursor.close()
         connection.close()
 

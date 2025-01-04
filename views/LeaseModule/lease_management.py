@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
-from controllers.SqlLiteControllers.lease_management_controller import fetch_leases, cancel_lease, delete_lease
+from controllers.PostGreSqlControllers.lease_management_controller import fetch_leases, cancel_lease, delete_lease
 from views.LeaseModule.add_lease import AddLeaseView
 
 

@@ -3,7 +3,7 @@
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 )
-from controllers.SqlLiteControllers.room_controller import add_room
+from controllers.PostGreSqlControllers.room_controller import add_room
 
 class AddRoomView(QDialog):
     def __init__(self, parent=None):

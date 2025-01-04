@@ -34,6 +34,36 @@ def fetch_payments():
     finally:
         cursor.close()
         connection.close()
+        
+def fetch_available_rooms():
+    """Fetch all available rooms from the 'availablerooms' view."""
+    try:
+        connection = psycopg2.connect(**DATABASE)
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM availablerooms")  # Query the view directly
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error fetching available rooms: {e}")
+        return []
+    finally:
+        if connection:
+            connection.close()
+
+            
+def fetch_tenants():
+    """Fetch all tenants using a PostgreSQL stored procedure."""
+    try:
+        connection = psycopg2.connect(**DATABASE)
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM tenantview')
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error fetching tenants: {e}")
+        return []
+    finally:
+        if connection:
+            connection.close()
+            
 
 def create_payment(tenant_id, room_id, amount, date, due_date, method, reference, notes):
     """Create a new payment."""
@@ -50,16 +80,33 @@ def create_payment(tenant_id, room_id, amount, date, due_date, method, reference
         cursor.close()
         connection.close()
 
-def update_payment(payment_id, amount, date, due_date, method, reference, notes, status):
-    """Update payment details."""
+# def update_payment(payment_id, amount, date, due_date, method, reference, notes, status):
+#     """Update payment details."""
+#     connection = get_connection()
+#     cursor = connection.cursor()
+#     try:
+#         cursor.execute("SELECT update_payment(%s, %s, %s, %s, %s, %s, %s, %s);",
+#                        (payment_id, amount, date, due_date, method, reference, notes, status))
+#         connection.commit()
+#     except Exception as e:
+#         print(f"Error updating payment: {e}")
+#         raise
+#     finally:
+#         cursor.close()
+#         connection.close()
+
+def update_payment(payment_id, amount, payment_date, due_date, method, reference, notes, status):
+    """Update payment details in PostgreSQL."""
     connection = get_connection()
     cursor = connection.cursor()
     try:
-        cursor.execute("SELECT update_payment(%s, %s, %s, %s, %s, %s, %s, %s);",
-                       (payment_id, amount, date, due_date, method, reference, notes, status))
+        cursor.execute("""
+            SELECT update_payment(%s, %s, %s, %s, %s, %s, %s, %s);
+        """, (payment_id, amount, payment_date, due_date, method, reference, notes, status))
         connection.commit()
+        print("Payment updated successfully!")
     except Exception as e:
-        print(f"Error updating payment: {e}")
+        print(f"Failed to update payment: {e}")
         raise
     finally:
         cursor.close()

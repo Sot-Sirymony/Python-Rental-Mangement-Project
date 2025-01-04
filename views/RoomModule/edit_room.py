@@ -1,6 +1,6 @@
 
 from PyQt6.QtWidgets import QVBoxLayout, QLineEdit, QPushButton, QLabel, QDialog, QMessageBox, QComboBox
-from controllers.SqlLiteControllers.room_controller import update_room
+from controllers.PostGreSqlControllers.room_controller import update_room
 
 
 class EditRoomView(QDialog):

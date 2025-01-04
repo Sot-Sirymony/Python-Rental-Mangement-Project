@@ -47,7 +47,7 @@ def add_tenant(first_name, last_name, phone, email):
         raise
     finally:
         cursor.close()
-        connection.close()
+        connection.close()          
 
 def update_tenant(tenant_id, first_name, last_name, phone, email):
     """Update an existing tenant."""
