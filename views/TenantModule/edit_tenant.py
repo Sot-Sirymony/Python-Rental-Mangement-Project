@@ -98,7 +98,7 @@ class EditTenantView(QDialog):
             return
 
         # Call the controller to save changes
-        from controllers.tenant_controller import update_tenant
+        from controllers.SqlLiteControllers.tenant_controller import update_tenant
         try:
             update_tenant(self.tenant_id, first_name, last_name, phone, email)
             print("Tenant updated successfully!")

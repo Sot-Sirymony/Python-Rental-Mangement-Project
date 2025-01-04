@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, QDateEdit, QComboBox, QPushButton, QMessageBox
 )
 from PyQt6.QtCore import QDate
-from controllers.payment_management_controller import update_payment
+from controllers.SqlLiteControllers.payment_management_controller import update_payment
 
 class EditPaymentView(QDialog):
     def __init__(self, payment, parent=None):

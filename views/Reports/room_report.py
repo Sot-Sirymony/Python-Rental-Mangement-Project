@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
 )
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from controllers.room_report_controller import fetch_room_summary, fetch_occupancy_analysis, fetch_financial_performance
+from controllers.SqlLiteControllers.room_report_controller import fetch_room_summary, fetch_occupancy_analysis, fetch_financial_performance
 import pandas as pd
 
 class RoomReport(QWidget):

@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, QDateEdit, QComboBox, QPushButton, QMessageBox
 )
 from PyQt6.QtCore import Qt, QDate
-from controllers.lease_management_controller import update_lease
+from controllers.SqlLiteControllers.lease_management_controller import update_lease
 
 class EditLeaseView(QDialog):
     def __init__(self, lease, parent=None):

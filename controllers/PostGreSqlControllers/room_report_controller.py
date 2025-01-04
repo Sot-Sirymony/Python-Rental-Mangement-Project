@@ -2,15 +2,23 @@ import psycopg2
 import pandas as pd
 
 DATABASE = {
-    'dbname': 'your_db_name',
-    'user': 'your_user',
-    'password': 'your_password',
+    'dbname': 'rental_management_db',
+    'user': 'postgres',
+    'password': 'Mony@1144',
     'host': 'localhost',
     'port': 5432
 }
 
+# def get_connection():
+#     return psycopg2.connect(**DATABASE)
 def get_connection():
-    return psycopg2.connect(**DATABASE)
+    try:
+        connection = psycopg2.connect(**DATABASE)
+        print("Connection successful!")
+        return connection  # Return the open connection
+    except Exception as e:
+        print(f"Connection failed: {e}")
+        return None  # Return None if the connection fails
 
 def fetch_room_summary():
     """Fetch room details for the summary report."""

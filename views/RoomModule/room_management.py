@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from functools import partial
-from controllers.room_controller import fetch_rooms
+from controllers.SqlLiteControllers.room_controller import fetch_rooms
 
 
 class RoomManagement(QWidget):
@@ -124,7 +124,7 @@ class RoomManagement(QWidget):
 
     def delete_room_action(self, room_id):
         """Delete a room."""
-        from controllers.room_controller import delete_room
+        from controllers.SqlLiteControllers.room_controller import delete_room
         try:
             delete_room(room_id)
             QMessageBox.information(self, "Success", f"Room ID {room_id} deleted successfully!")

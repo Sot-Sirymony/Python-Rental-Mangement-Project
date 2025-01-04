@@ -62,7 +62,7 @@ class TenantManagement(QWidget):
 
     def load_tenants(self):
         """Fetch and display tenant data."""
-        from controllers.tenant_controller import fetch_tenants, delete_tenant
+        from controllers.SqlLiteControllers.tenant_controller import fetch_tenants, delete_tenant
         tenants = fetch_tenants()
         self.tenant_table.setRowCount(0)
 
@@ -91,7 +91,7 @@ class TenantManagement(QWidget):
 
     def search_tenants(self, search_text):
         """Search tenants by name or contact."""
-        from controllers.tenant_controller import fetch_tenants
+        from controllers.SqlLiteControllers.tenant_controller import fetch_tenants
         tenants = fetch_tenants()
         filtered_tenants = [
             tenant for tenant in tenants if search_text.lower() in tenant[1].lower() or search_text.lower() in tenant[2].lower()
@@ -123,7 +123,7 @@ class TenantManagement(QWidget):
 
     def delete_tenant_action(self, tenant_id):
         """Delete a tenant."""
-        from controllers.tenant_controller import delete_tenant
+        from controllers.SqlLiteControllers.tenant_controller import delete_tenant
         try:
             delete_tenant(tenant_id)
             QMessageBox.information(self, "Success", f"Tenant ID {tenant_id} deleted successfully!")

@@ -1,3 +1,11 @@
+--Create Tenant table
+CREATE TABLE Tenant (
+id SERIAL PRIMARY KEY,
+first_name TEXT NOT NULL,
+last_name TEXT NOT NULL,
+phone TEXT UNIQUE NOT NULL,
+email TEXT UNIQUE NOT NULL
+);
 --Create Room table
 CREATE TABLE Room (
 id SERIAL PRIMARY KEY,
@@ -13,14 +21,7 @@ tenant_id INTEGER REFERENCES Tenant (id) ON DELETE SET NULL,
 amenities TEXT,
 total_rent_collected NUMERIC DEFAULT 0
 );
---Create Tenant table
-CREATE TABLE Tenant (
-id SERIAL PRIMARY KEY,
-first_name TEXT NOT NULL,
-last_name TEXT NOT NULL,
-phone TEXT UNIQUE NOT NULL,
-email TEXT UNIQUE NOT NULL
-);
+
 --Create Payment table
 CREATE TABLE Payment (
 id SERIAL PRIMARY KEY,
