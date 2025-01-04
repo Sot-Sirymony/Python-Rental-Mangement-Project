@@ -71,18 +71,53 @@ class RoomManagement(QWidget):
 
         self.load_rooms()
 
+    # def load_rooms(self):
+    #     """Fetch and display all rooms."""
+    #     try:
+    #         rooms = fetch_rooms()
+    #         if not rooms:
+    #             QMessageBox.information(self, "Info", "No rooms found.")
+    #             self.room_table.setRowCount(0)  # Clear any existing rows
+    #             return
+    #         self.populate_table(rooms)
+    #     except Exception as e:
+    #         QMessageBox.critical(self, "Error", f"Failed to load rooms: {e}")
     def load_rooms(self):
-        """Fetch and display all rooms."""
         try:
             rooms = fetch_rooms()
+            print("Debug: Rooms data:", rooms)  # Check fetched data
             if not rooms:
                 QMessageBox.information(self, "Info", "No rooms found.")
-                self.room_table.setRowCount(0)  # Clear any existing rows
+                self.room_table.setRowCount(0)
                 return
             self.populate_table(rooms)
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to load rooms: {e}")
 
+
+    # def populate_table(self, rooms):
+    #     """Populate the table with room data."""
+    #     self.room_table.setRowCount(0)  # Clear existing rows
+
+    #     # Set font for table rows
+    #     row_font = QFont()
+    #     row_font.setPointSize(14)  # Set font size for row values
+
+    #     for row_data in rooms:
+    #         row = self.room_table.rowCount()
+    #         self.room_table.insertRow(row)
+
+    #         # Populate all columns with room data (excluding actions)
+    #         for col, data in enumerate(row_data[:6]):
+    #             item = QTableWidgetItem(str(data) if data is not None else "N/A")
+    #             item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)  # Center-align text
+    #             item.setFont(row_font)  # Apply the font to the row item
+    #             self.room_table.setItem(row, col, item)
+
+    #         # Add action buttons
+    #         self.add_edit_action(row, row_data)
+    #         self.add_delete_action(row, row_data)
+    
     def populate_table(self, rooms):
         """Populate the table with room data."""
         self.room_table.setRowCount(0)  # Clear existing rows
@@ -91,20 +126,29 @@ class RoomManagement(QWidget):
         row_font = QFont()
         row_font.setPointSize(14)  # Set font size for row values
 
-        for row_data in rooms:
+        for row_index, row_data in enumerate(rooms):
+            print(f"Debug: Row {row_index} data: {row_data}")  # Log the row data
             row = self.room_table.rowCount()
             self.room_table.insertRow(row)
 
-            # Populate all columns with room data (excluding actions)
-            for col, data in enumerate(row_data[:6]):
-                item = QTableWidgetItem(str(data) if data is not None else "N/A")
-                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)  # Center-align text
-                item.setFont(row_font)  # Apply the font to the row item
+            # Populate columns 0-4 with room data
+            for col in range(5):  # Room ID, Name, Type, Size, Rental Price
+                item = QTableWidgetItem(str(row_data[col]) if row_data[col] is not None else "N/A")
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                item.setFont(row_font)
                 self.room_table.setItem(row, col, item)
+
+            # Populate Occupancy Status (Column 5)
+            occupancy_status = row_data[8]  # Index 8 based on debug output
+            item = QTableWidgetItem(occupancy_status if occupancy_status else "N/A")
+            item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            item.setFont(row_font)
+            self.room_table.setItem(row, 5, item)
 
             # Add action buttons
             self.add_edit_action(row, row_data)
             self.add_delete_action(row, row_data)
+
 
     def add_edit_action(self, row, row_data):
         """Add the Edit button to the table."""
