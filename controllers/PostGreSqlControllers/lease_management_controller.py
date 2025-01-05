@@ -31,19 +31,6 @@ def fetch_leases():
     finally:
         cursor.close()
         connection.close()
-# def fetch_available_rooms():
-#     """Fetch all available rooms using a PostgreSQL stored procedure."""
-#     try:
-#         connection = psycopg2.connect(**DATABASE)
-#         cursor = connection.cursor()
-#         cursor.callproc('fetch_available_rooms')
-#         return cursor.fetchall()
-#     except Exception as e:
-#         print(f"Error fetching available rooms: {e}")
-#         return []
-#     finally:
-#         if connection:
-#             connection.close()
 #fetch from view 
 def fetch_available_rooms():
     """Fetch all available rooms from the 'availablerooms' view."""
