@@ -7,7 +7,6 @@ from PyQt6.QtGui import QFont
 from controllers.PostGreSqlControllers.lease_management_controller import fetch_leases, cancel_lease, delete_lease
 from views.LeaseModule.add_lease import AddLeaseView
 
-
 class LeaseManagement(QWidget):
     def __init__(self):
         super().__init__()
@@ -78,9 +77,6 @@ class LeaseManagement(QWidget):
             delete_btn.setStyleSheet("font-size: 14px; font-weight: bold; padding: 4px;")
             delete_btn.clicked.connect(lambda _, l=lease: self.delete_lease_action(l[0]))
             self.lease_table.setCellWidget(row, 8, delete_btn)
-
-    # def edit_lease(self, lease):
-    #     QMessageBox.information(self, "Edit Lease", f"Editing lease: {lease}")
     
     def edit_lease(self, lease):
         """Open Edit Lease dialog."""
