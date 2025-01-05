@@ -70,18 +70,6 @@ class RoomManagement(QWidget):
         self.setLayout(self.layout)
 
         self.load_rooms()
-
-    # def load_rooms(self):
-    #     """Fetch and display all rooms."""
-    #     try:
-    #         rooms = fetch_rooms()
-    #         if not rooms:
-    #             QMessageBox.information(self, "Info", "No rooms found.")
-    #             self.room_table.setRowCount(0)  # Clear any existing rows
-    #             return
-    #         self.populate_table(rooms)
-    #     except Exception as e:
-    #         QMessageBox.critical(self, "Error", f"Failed to load rooms: {e}")
     def load_rooms(self):
         try:
             rooms = fetch_rooms()
@@ -93,30 +81,6 @@ class RoomManagement(QWidget):
             self.populate_table(rooms)
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to load rooms: {e}")
-
-
-    # def populate_table(self, rooms):
-    #     """Populate the table with room data."""
-    #     self.room_table.setRowCount(0)  # Clear existing rows
-
-    #     # Set font for table rows
-    #     row_font = QFont()
-    #     row_font.setPointSize(14)  # Set font size for row values
-
-    #     for row_data in rooms:
-    #         row = self.room_table.rowCount()
-    #         self.room_table.insertRow(row)
-
-    #         # Populate all columns with room data (excluding actions)
-    #         for col, data in enumerate(row_data[:6]):
-    #             item = QTableWidgetItem(str(data) if data is not None else "N/A")
-    #             item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)  # Center-align text
-    #             item.setFont(row_font)  # Apply the font to the row item
-    #             self.room_table.setItem(row, col, item)
-
-    #         # Add action buttons
-    #         self.add_edit_action(row, row_data)
-    #         self.add_delete_action(row, row_data)
     
     def populate_table(self, rooms):
         """Populate the table with room data."""

@@ -1,6 +1,5 @@
 import psycopg2
 import pandas as pd
-
 DATABASE = {
     'dbname': 'rental_management_db',
     'user': 'postgres',
@@ -8,9 +7,6 @@ DATABASE = {
     'host': 'localhost',
     'port': 5432
 }
-
-# def get_connection():
-#     return psycopg2.connect(**DATABASE)
 def get_connection():
     try:
         connection = psycopg2.connect(**DATABASE)
